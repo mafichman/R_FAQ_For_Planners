@@ -93,13 +93,13 @@ If you are writing code, you can save your code as either a .R file (just plain 
 
 How do you "run code" in R?
 
-Usually, I will give you a bunch of code in class, and you will have to adapt that code for a project you are doing. Eventually, you will write some of your own code - but *most people cut and paste stuff* and switch things around, so don't worry about writing things from scratch.
+Usually, I will give you a bunch of code in class, and you will have to adapt that code for a project you are doing. Eventually, you will write some of your own code - but *most people cut and paste stuff* and switch variable names and input data sets around. That's how I do much of my work - I grab things from my code base I've generated over the years. So don't worry about writing things from scratch.
 
 - Code with a `#` in front of it is called "commented code." This stuff doesn't execute it's where you make notes.
 
 - Code without the `#` will run - either as written in the console or by hitting ctrl+enter on code the code window
 
-R is case sensitive - many of your issues can be resolved by checking your syntax
+R is case sensitive - many of your issues can be resolved by checking your syntax. You might get some kind of error because you created a data set called `derp` and you try to call it in the code with `DERP`. Happens *all the time*.
 
 ## Naming Variables and Data Sets
 
@@ -172,17 +172,17 @@ For work in our class, you should load up the tidyverse on every project. Most o
 
 # Loading Data 
 
-Most projects will start with you loading some spreadsheet-like data - from a survey you conducted, from an excel sheet, from the Census' website, from a shapefile that I gave you for class.  There are several ways to load data into your R environment.
+Most projects will start with you loading some spreadsheet-like data - from a survey you conducted, from an excel sheet, from the Census' website, from a shapefile that I gave you for class.  There are a lot of file types you can load, and some of them have their own functions, like you can read in Excel data with the `read_excel` function in the `readxl` package. Later on I will show you how to read in a .shp.
+
+There are several ways to load data into your R environment.
 
 ## Loading Data From Your Computer
 
-You can load data from your computer in one of two ways, either by going to "File / Import Data Set" in R Studio, and clicking on the relevant options (note that "From txt" will let you load a csv, txt, tsv or other similar file types), or by doing it with code, like this:
+You can load data from your computer in one of two ways, either by going to `File / Import Data Set` in a dropdown menu R Studio, and clicking on the relevant options (note that "From txt" will let you load a csv, txt, tsv or other similar file types), or by doing it with code, like this:
 
 ```{r myData_cpu, eval = FALSE}
 myData <- read.csv("filepath/onMyComputer/fileName.csv")
 ```
-
-There are a lot of file types you can load, and some of them have their own functions, like the `read_excel` function in the `readxl` package.
 
 ## Loading Data from the Web
 

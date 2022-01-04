@@ -312,12 +312,12 @@ div.tocify {
 <div id="data-and-coding-basics" class="section level1">
 <h1>Data and Coding Basics</h1>
 <p>How do you “run code” in R?</p>
-<p>Usually, I will give you a bunch of code in class, and you will have to adapt that code for a project you are doing. Eventually, you will write some of your own code - but <em>most people cut and paste stuff</em> and switch things around, so don’t worry about writing things from scratch.</p>
+<p>Usually, I will give you a bunch of code in class, and you will have to adapt that code for a project you are doing. Eventually, you will write some of your own code - but <em>most people cut and paste stuff</em> and switch variable names and input data sets around. That’s how I do much of my work - I grab things from my code base I’ve generated over the years. So don’t worry about writing things from scratch.</p>
 <ul>
 <li><p>Code with a <code>#</code> in front of it is called “commented code.” This stuff doesn’t execute it’s where you make notes.</p></li>
 <li><p>Code without the <code>#</code> will run - either as written in the console or by hitting ctrl+enter on code the code window</p></li>
 </ul>
-<p>R is case sensitive - many of your issues can be resolved by checking your syntax</p>
+<p>R is case sensitive - many of your issues can be resolved by checking your syntax. You might get some kind of error because you created a data set called <code>derp</code> and you try to call it in the code with <code>DERP</code>. Happens <em>all the time</em>.</p>
 <div id="naming-variables-and-data-sets" class="section level2">
 <h2>Naming Variables and Data Sets</h2>
 <p>Most pieces of data you load into R or create with R will have a name. If you load in a spreadsheet, you will want to give it a name so it shows up in my R environment. You can assign information to a variable using this sign “&lt;-”</p>
@@ -368,12 +368,12 @@ median(vector2)</code></pre>
 </div>
 <div id="loading-data" class="section level1">
 <h1>Loading Data</h1>
-<p>Most projects will start with you loading some spreadsheet-like data - from a survey you conducted, from an excel sheet, from the Census’ website, from a shapefile that I gave you for class. There are several ways to load data into your R environment.</p>
+<p>Most projects will start with you loading some spreadsheet-like data - from a survey you conducted, from an excel sheet, from the Census’ website, from a shapefile that I gave you for class. There are a lot of file types you can load, and some of them have their own functions, like you can read in Excel data with the <code>read_excel</code> function in the <code>readxl</code> package. Later on I will show you how to read in a .shp.</p>
+<p>There are several ways to load data into your R environment.</p>
 <div id="loading-data-from-your-computer" class="section level2">
 <h2>Loading Data From Your Computer</h2>
-<p>You can load data from your computer in one of two ways, either by going to “File / Import Data Set” in R Studio, and clicking on the relevant options (note that “From txt” will let you load a csv, txt, tsv or other similar file types), or by doing it with code, like this:</p>
+<p>You can load data from your computer in one of two ways, either by going to <code>File / Import Data Set</code> in a dropdown menu R Studio, and clicking on the relevant options (note that “From txt” will let you load a csv, txt, tsv or other similar file types), or by doing it with code, like this:</p>
 <pre class="r"><code>myData &lt;- read.csv(&quot;filepath/onMyComputer/fileName.csv&quot;)</code></pre>
-<p>There are a lot of file types you can load, and some of them have their own functions, like the <code>read_excel</code> function in the <code>readxl</code> package.</p>
 </div>
 <div id="loading-data-from-the-web" class="section level2">
 <h2>Loading Data from the Web</h2>
