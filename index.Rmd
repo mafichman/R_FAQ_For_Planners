@@ -13,31 +13,31 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-For years, I've been teaching data analysis, statistical modeling, and spatial analysis using the software language R. It's always a challenge to get students started with some basics, so that we can move quickly to applied methods and concepts. As students get more sophisticated, there are some common questions and issues that many confront.  I decided to compile this stuff, both to memorialize the important issues and how they are best understood, and to find a place to tell students to go "look it up" when common questions arise. 
+# Introduction
 
-This is a working document designed to give a basic introduction to R and compile frequently asked questions about basic operations, that come up in class. This is *not* an in-depth guide or series of exercises, it's more of a starter kit and reference document. It will be updated on an ongoing basis (and might look like a total construction site at times).
+For years, I've been teaching data analysis, statistical modeling, and spatial analysis to Urban Planning and Spatial Analytics graduate students using the software language R. It's always a challenge to get students started with some basics so that we can move quickly to applied methods and concepts. As students get more sophisticated, there are some common questions and issues that many confront.
+
+This is a working document designed to give a basic introduction to R and compile frequently asked questions about basic operations that come up in class. This isn't really a "coding" tutorial, it's a way to demonstrate some simple Excel or ArcGIS-like tasks - loading spreadsheets and spatial data, creating new columns of data, summarizing and querying data, making charts and maps. 
+
+This is *not* an in-depth guide or series of exercises, it's more of a starter kit and reference document. It is designed to support the exercises and assignments I have assigned you in class. It will be updated on an ongoing basis (and might look like a total construction site at times).
 
 Use the table of contents at left to navigate through the document - the simplest topics are first (e.g. "What is R?") and the more advanced stuff comes later (e.g. "Using github"). There are references to other books and materials at the end of the doc.
 
-Michael Fichman
+**Michael Fichman**
 
-Lecturer
+*Lecturer, Department of City and Regional Planning
 
 Interim Program Director, Masters of Urban Spatial Analytics
 
-Researcher, PennPraxis
+University of Pennsylvania Weitzman School of Design*
 
-Data Scientist, Center for Safe Mobility
-
-University of Pennsylvania Weitzman School of Design
-
-# Getting Started
+# Getting Started with R
 
 ## What is R?
 
 R is a programming language you can use to do stuff that you can do in Excel, or ArcGIS, or stats software like SAS... but (with some practice) faster, better, and more efficiently. 
 
-You can load data, summarize it, make charts, make maps. You can also do way more complicated stuff too. Most importantly, you can set up routines or workflows to let you repeat processes that in other software would take lots of clicks and steps.
+You can load data in spreadsheet form, make new columns, summarize it, make charts, make maps. You can also do way more complicated stuff too. Most importantly, you can set up routines or workflows to let you repeat processes that in other software would take lots of clicks and steps.
 
 It's "open source," which means it is written and maintained by a community of people like you and me. That also means that sometimes, things will go wrong and there isn't always a manual to consult.
 
@@ -57,6 +57,8 @@ I run R in a thing called R Studio, which is like a viewer for R. You can see pl
 
 ## R Studio Orientation
 
+Now open up R Studio and let's take a look at some of the components.
+
 ### The Console
 
 You can type and execute code in the console.
@@ -65,7 +67,7 @@ I could type something like `myName <- "Michael"` into the console, and it would
 
 ### The Environment
 
-This is where you can see the data sets and other things you've loaded. If I load an excel spreadsheet into R using `read_excel`, I could say something like `myData <- read_excel("filepath_on_my_computer.xlsx")` it will show up in my environment as a thing called `myData`.
+This is where you can see the data sets and other things you've loaded into R to work on. If I load an excel spreadsheet into R using `read_excel`, I could say something like `myData <- read_excel("filepath_on_my_computer.xlsx")` it will show up in my environment as a thing called `myData`.
 
 You can clear the environment by going to the `Session` dropdown and saying `Clear Workspace`.
 
@@ -75,15 +77,17 @@ You can also save your environment or load up an old one from a project you were
 
 If you load up a .R or .rmd file - two types of R files, they will show up as tabs in your code window.
 
-You can save your code as either a .R file (just your code), or a .rmd file (a Markdown file, which is something you can write to present code or analysis - more on that later in this document.)
+If I give you some code, you can execute it a piece at a time by copying-and-pasting into the console, or highlighting code and hitting `ctrl+Enter` to run it.
+
+If you are writing code, you can save your code as either a .R file (just plain code), or a .rmd file (a Markdown file, like what you are reading now, which is something you can write to present code or analysis.)
 
 ### The Plotting / Files / Packages etc Window
 
-If you make charts or plots - they show up in this window.
+-If you make charts or plots - they show up in this window.
 
-The "Files" tab is a place to look through files in your work project.
+-The "Files" tab is a place to look through files in your work project.
 
-You can consult the "Packages" or "Help" tabs to find documentation about different functions and packages in the R world.
+-You can consult the "Packages" or "Help" tabs to find documentation about different functions and packages in the R world. (More about packages later)
 
 # Data and Coding Basics
 
@@ -97,11 +101,11 @@ Usually, I will give you a bunch of code in class, and you will have to adapt th
 
 R is case sensitive - many of your issues can be resolved by checking your syntax
 
-## Making Variables
+## Naming Variables and Data Sets
 
-You can assign information to a variable using this sign "<-"
+Most pieces of data you load into R or create with R will have a name. If you load in a spreadsheet, you will want to give it a name so it shows up in my R environment.  You can assign information to a variable using this sign "<-"
 
-You can have all kinds of data objecst:
+You can have all kinds of data objects:
 
 - A data frame: a matrix of data with column names, basically like an excel spreadsheet (much more on this later)
 
@@ -158,9 +162,13 @@ If you have already installed a package on your computer, you can load it into y
 library(tidyverse)
 ```
 
+Packages all come with documentation - lists of functions in these packages have little vignettes that tell you how to use them.  Check that out in the "Packages" tab in your R Studio environment to see these, or just google package names or function names to find the documentation.
+
 ## The Tidyverse
 
-The `tidyverse`, which we loaded in the previous code chunk, is a group of important packages which are used to wrangle data, make graphics, load data, handle dates, handle text. Better yet, these projects are coordinated by their developers, so they all work nicely together. I load it in every single project.
+The `tidyverse`, which we loaded in the previous code chunk, is a group of important packages which are used to wrangle data, make graphics, load data, handle dates, handle text. Better yet, these projects are coordinated by their developers, so they all work nicely together.
+
+For work in our class, you should load up the tidyverse on every project. Most of my code doesn't work without it.
 
 # Loading Data 
 
@@ -170,21 +178,37 @@ Most projects will start with you loading some spreadsheet-like data - from a su
 
 You can load data from your computer in one of two ways, either by going to "File / Import Data Set" in R Studio, and clicking on the relevant options (note that "From txt" will let you load a csv, txt, tsv or other similar file types), or by doing it with code, like this:
 
-`myData <- read.csv("filepath/onMyComputer/fileName.csv")`
+```{r myData_cpu, eval = FALSE}
+myData <- read.csv("filepath/onMyComputer/fileName.csv")
+```
 
 There are a lot of file types you can load, and some of them have their own functions, like the `read_excel` function in the `readxl` package.
 
 ## Loading Data from the Web
 
-You can load data from the web, like from Google Drive, using the same kind of syntax:
+You can load data from the web, like from Google Drive or Github, using the same kind of syntax:
 
-`myData <- read.csv("theURLgoesHere.csv")`
+```{r myData_url}
+myData <- read.csv("https://raw.githubusercontent.com/mafichman/R_FAQ_For_Planners/main/data/someCensusData.csv")
+```
 
 ## Viewing Data
 
+Now that you've loaded in some data, you can examine them in several ways. You can `View(myData)` and see a visual representation of the data in an excel-like way, or you can `glimpse` the data.
+
+`glimpse` will tell you what data types the columns are (character, numeric, etc), let you see some samples of the data, and let you see how many rows and columns the data contain.
+
+```{r glimpse_myData}
+glimpse(myData)
+```
+
 # Manipulating Data with dplyr
 
-## Piping Commands
+## Setting Up Data Wrangling Pipelines
+
+What does the pipe do?
+
+Here's an example...
 
 ## Dplyr commands
 
@@ -194,7 +218,11 @@ You can load data from the web, like from Google Drive, using the same kind of s
 
 `rename` changes the name of a column
 
+doing an ifelse or case_when
+
 ## Summarizing Data
+
+group_by and summarize
 
 ## Querying Data
 
@@ -204,27 +232,33 @@ How long is it, how wide is it. glimpse, etc
 
 # Making Plots with ggplot2
 
+Here are 2-3 kinds of plots
+
+Making your own graphics recipes
+
+Facets, Wide data and long data
+
 # Vector GIS With sf
 
-## Loading Data
+Loading Data
 
-## Making Maps with ggplot2
+Making Maps with ggplot2
 
-## Projections
+Projections
 
-## Vector Geoprocessing
+Vector Geoprocessing
 
 # Tidycensus
+
+Grab some data with tidycensus
 
 # R Markdown
 
 I will probably be asking you to turn in assignments using R Markdown. Markdown is a way to present your code-based projects as a more polished document. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-## Global Options
+## markdown to do
 
-## Chunk Options
-
-## Kable Tables in R Markdown
+Global Options, Chunk Options, kable tables
 
 # Querying APIs
 
@@ -232,27 +266,13 @@ Some data are served on the web in APIs or Application Programming Interfaces, w
 
 # Other Spatial Packages
 
-## Mapview & Leaflet
-
-...
-
-## Raster
-
-...
-
-## Open Street Map
-
-...
+Mapview, Leaflet, osmdata, raster
 
 # Project Workflows - Github and R Projects
 
-## Github
+Github, R Projects, Writing Readable Code
 
-## R Projects
-
-## Writing Readable Code
-
-# Resources and books
+# Resources and texts
 
 ## Troubleshooting - How to ask a question
 
@@ -276,7 +296,11 @@ R Studio's website has some really good "cheat sheets" with simple walkthroughs 
 
 - dplyr Cheat Sheet
 
-- 
+- sf
+
+- R markdown
+
+- lubridate
 
 ## Style Guides
 
@@ -289,8 +313,13 @@ Handy tips for making your code readable
 ## Books
 
 Data Visualization - Kieran Healy
+
 R for Data Science - Hadley Wickham
+
 Robin Lovelace
+
 Ken Steif
+
 Kyle Walker
+
 Paula Moraga

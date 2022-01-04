@@ -247,21 +247,23 @@ div.tocify {
 </div>
 
 
-<p>For years, I’ve been teaching data analysis, statistical modeling, and spatial analysis using the software language R. It’s always a challenge to get students started with some basics, so that we can move quickly to applied methods and concepts. As students get more sophisticated, there are some common questions and issues that many confront. I decided to compile this stuff, both to memorialize the important issues and how they are best understood, and to find a place to tell students to go “look it up” when common questions arise.</p>
-<p>This is a working document designed to give a basic introduction to R and compile frequently asked questions about basic operations, that come up in class. This is <em>not</em> an in-depth guide or series of exercises, it’s more of a starter kit and reference document. It will be updated on an ongoing basis (and might look like a total construction site at times).</p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>For years, I’ve been teaching data analysis, statistical modeling, and spatial analysis to Urban Planning and Spatial Analytics graduate students using the software language R. It’s always a challenge to get students started with some basics so that we can move quickly to applied methods and concepts. As students get more sophisticated, there are some common questions and issues that many confront.</p>
+<p>This is a working document designed to give a basic introduction to R and compile frequently asked questions about basic operations that come up in class. This isn’t really a “coding” tutorial, it’s a way to demonstrate some simple Excel or ArcGIS-like tasks - loading spreadsheets and spatial data, creating new columns of data, summarizing and querying data, making charts and maps.</p>
+<p>This is <em>not</em> an in-depth guide or series of exercises, it’s more of a starter kit and reference document. It is designed to support the exercises and assignments I have assigned you in class. It will be updated on an ongoing basis (and might look like a total construction site at times).</p>
 <p>Use the table of contents at left to navigate through the document - the simplest topics are first (e.g. “What is R?”) and the more advanced stuff comes later (e.g. “Using github”). There are references to other books and materials at the end of the doc.</p>
-<p>Michael Fichman</p>
-<p>Lecturer</p>
+<p><strong>Michael Fichman</strong></p>
+<p>*Lecturer, Department of City and Regional Planning</p>
 <p>Interim Program Director, Masters of Urban Spatial Analytics</p>
-<p>Researcher, PennPraxis</p>
-<p>Data Scientist, Center for Safe Mobility</p>
-<p>University of Pennsylvania Weitzman School of Design</p>
-<div id="getting-started" class="section level1">
-<h1>Getting Started</h1>
+<p>University of Pennsylvania Weitzman School of Design*</p>
+</div>
+<div id="getting-started-with-r" class="section level1">
+<h1>Getting Started with R</h1>
 <div id="what-is-r" class="section level2">
 <h2>What is R?</h2>
 <p>R is a programming language you can use to do stuff that you can do in Excel, or ArcGIS, or stats software like SAS… but (with some practice) faster, better, and more efficiently.</p>
-<p>You can load data, summarize it, make charts, make maps. You can also do way more complicated stuff too. Most importantly, you can set up routines or workflows to let you repeat processes that in other software would take lots of clicks and steps.</p>
+<p>You can load data in spreadsheet form, make new columns, summarize it, make charts, make maps. You can also do way more complicated stuff too. Most importantly, you can set up routines or workflows to let you repeat processes that in other software would take lots of clicks and steps.</p>
 <p>It’s “open source,” which means it is written and maintained by a community of people like you and me. That also means that sometimes, things will go wrong and there isn’t always a manual to consult.</p>
 <p>If you’ve never programmed before, that’s OK, you’re in the right place.</p>
 </div>
@@ -281,6 +283,7 @@ div.tocify {
 </div>
 <div id="r-studio-orientation" class="section level2">
 <h2>R Studio Orientation</h2>
+<p>Now open up R Studio and let’s take a look at some of the components.</p>
 <div id="the-console" class="section level3">
 <h3>The Console</h3>
 <p>You can type and execute code in the console.</p>
@@ -288,20 +291,21 @@ div.tocify {
 </div>
 <div id="the-environment" class="section level3">
 <h3>The Environment</h3>
-<p>This is where you can see the data sets and other things you’ve loaded. If I load an excel spreadsheet into R using <code>read_excel</code>, I could say something like <code>myData &lt;- read_excel(&quot;filepath_on_my_computer.xlsx&quot;)</code> it will show up in my environment as a thing called <code>myData</code>.</p>
+<p>This is where you can see the data sets and other things you’ve loaded into R to work on. If I load an excel spreadsheet into R using <code>read_excel</code>, I could say something like <code>myData &lt;- read_excel(&quot;filepath_on_my_computer.xlsx&quot;)</code> it will show up in my environment as a thing called <code>myData</code>.</p>
 <p>You can clear the environment by going to the <code>Session</code> dropdown and saying <code>Clear Workspace</code>.</p>
 <p>You can also save your environment or load up an old one from a project you were working on.</p>
 </div>
 <div id="the-code-window" class="section level3">
 <h3>The Code window</h3>
 <p>If you load up a .R or .rmd file - two types of R files, they will show up as tabs in your code window.</p>
-<p>You can save your code as either a .R file (just your code), or a .rmd file (a Markdown file, which is something you can write to present code or analysis - more on that later in this document.)</p>
+<p>If I give you some code, you can execute it a piece at a time by copying-and-pasting into the console, or highlighting code and hitting <code>ctrl+Enter</code> to run it.</p>
+<p>If you are writing code, you can save your code as either a .R file (just plain code), or a .rmd file (a Markdown file, like what you are reading now, which is something you can write to present code or analysis.)</p>
 </div>
 <div id="the-plotting-files-packages-etc-window" class="section level3">
 <h3>The Plotting / Files / Packages etc Window</h3>
-<p>If you make charts or plots - they show up in this window.</p>
-<p>The “Files” tab is a place to look through files in your work project.</p>
-<p>You can consult the “Packages” or “Help” tabs to find documentation about different functions and packages in the R world.</p>
+<p>-If you make charts or plots - they show up in this window.</p>
+<p>-The “Files” tab is a place to look through files in your work project.</p>
+<p>-You can consult the “Packages” or “Help” tabs to find documentation about different functions and packages in the R world. (More about packages later)</p>
 </div>
 </div>
 </div>
@@ -314,10 +318,10 @@ div.tocify {
 <li><p>Code without the <code>#</code> will run - either as written in the console or by hitting ctrl+enter on code the code window</p></li>
 </ul>
 <p>R is case sensitive - many of your issues can be resolved by checking your syntax</p>
-<div id="making-variables" class="section level2">
-<h2>Making Variables</h2>
-<p>You can assign information to a variable using this sign “&lt;-”</p>
-<p>You can have all kinds of data objecst:</p>
+<div id="naming-variables-and-data-sets" class="section level2">
+<h2>Naming Variables and Data Sets</h2>
+<p>Most pieces of data you load into R or create with R will have a name. If you load in a spreadsheet, you will want to give it a name so it shows up in my R environment. You can assign information to a variable using this sign “&lt;-”</p>
+<p>You can have all kinds of data objects:</p>
 <ul>
 <li><p>A data frame: a matrix of data with column names, basically like an excel spreadsheet (much more on this later)</p></li>
 <li><p>A vector: a list of items, denoted with the letter c, like this:</p></li>
@@ -355,9 +359,11 @@ median(vector2)</code></pre>
 <pre class="r"><code>install.packages(&#39;tidyverse&#39;)</code></pre>
 <p>If you have already installed a package on your computer, you can load it into your environment using the <code>library</code> command.</p>
 <pre class="r"><code>library(tidyverse)</code></pre>
+<p>Packages all come with documentation - lists of functions in these packages have little vignettes that tell you how to use them. Check that out in the “Packages” tab in your R Studio environment to see these, or just google package names or function names to find the documentation.</p>
 <div id="the-tidyverse" class="section level2">
 <h2>The Tidyverse</h2>
-<p>The <code>tidyverse</code>, which we loaded in the previous code chunk, is a group of important packages which are used to wrangle data, make graphics, load data, handle dates, handle text. Better yet, these projects are coordinated by their developers, so they all work nicely together. I load it in every single project.</p>
+<p>The <code>tidyverse</code>, which we loaded in the previous code chunk, is a group of important packages which are used to wrangle data, make graphics, load data, handle dates, handle text. Better yet, these projects are coordinated by their developers, so they all work nicely together.</p>
+<p>For work in our class, you should load up the tidyverse on every project. Most of my code doesn’t work without it.</p>
 </div>
 </div>
 <div id="loading-data" class="section level1">
@@ -366,31 +372,63 @@ median(vector2)</code></pre>
 <div id="loading-data-from-your-computer" class="section level2">
 <h2>Loading Data From Your Computer</h2>
 <p>You can load data from your computer in one of two ways, either by going to “File / Import Data Set” in R Studio, and clicking on the relevant options (note that “From txt” will let you load a csv, txt, tsv or other similar file types), or by doing it with code, like this:</p>
-<p><code>myData &lt;- read.csv(&quot;filepath/onMyComputer/fileName.csv&quot;)</code></p>
+<pre class="r"><code>myData &lt;- read.csv(&quot;filepath/onMyComputer/fileName.csv&quot;)</code></pre>
 <p>There are a lot of file types you can load, and some of them have their own functions, like the <code>read_excel</code> function in the <code>readxl</code> package.</p>
 </div>
 <div id="loading-data-from-the-web" class="section level2">
 <h2>Loading Data from the Web</h2>
-<p>You can load data from the web, like from Google Drive, using the same kind of syntax:</p>
-<p><code>myData &lt;- read.csv(&quot;theURLgoesHere.csv&quot;)</code></p>
+<p>You can load data from the web, like from Google Drive or Github, using the same kind of syntax:</p>
+<pre class="r"><code>myData &lt;- read.csv(&quot;https://raw.githubusercontent.com/mafichman/R_FAQ_For_Planners/main/data/someCensusData.csv&quot;)</code></pre>
 </div>
 <div id="viewing-data" class="section level2">
 <h2>Viewing Data</h2>
+<p>Now that you’ve loaded in some data, you can examine them in several ways. You can <code>View(myData)</code> and see a visual representation of the data in an excel-like way, or you can <code>glimpse</code> the data.</p>
+<p><code>glimpse</code> will tell you what data types the columns are (character, numeric, etc), let you see some samples of the data, and let you see how many rows and columns the data contain.</p>
+<pre class="r"><code>glimpse(myData)</code></pre>
+<pre><code>## Rows: 384
+## Columns: 23
+## $ X                      &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, ~
+## $ GEOID                  &lt;dbl&gt; 4.2101e+10, 4.2101e+10, 4.2101e+10, 4.2101e+10,~
+## $ NAME.x                 &lt;chr&gt; &quot;Census Tract 1, Philadelphia County, Pennsylva~
+## $ total_pop.2010         &lt;int&gt; 2883, 1886, 2915, 1525, 3156, 948, 938, 2538, 1~
+## $ total_HU.2010          &lt;int&gt; 2455, 1128, 2038, 1531, 2534, 750, 713, 2284, 1~
+## $ total_vacant.2010      &lt;int&gt; 422, 123, 206, 362, 239, 114, 60, 341, 67, 433,~
+## $ med_HH_Income.2010     &lt;int&gt; 73041, 43218, 65577, 21832, 50020, 45357, 53938~
+## $ total_White.2010       &lt;int&gt; 2660, 358, 2968, 876, 2762, 849, 863, 1981, 118~
+## $ total_GradDeg.2010     &lt;int&gt; 918, 254, 1107, 323, 1048, 321, 426, 699, 496, ~
+## $ vacancyPct.2010        &lt;dbl&gt; 0.17189409, 0.10904255, 0.10107949, 0.23644677,~
+## $ pctWhite.2010          &lt;dbl&gt; 0.9226500, 0.1898197, 1.0181818, 0.5744262, 0.8~
+## $ NAME.y                 &lt;chr&gt; &quot;Census Tract 1, Philadelphia County, Pennsylva~
+## $ total_pop.2016         &lt;int&gt; 3983, 2357, 3315, 2633, 3202, 1305, 1021, 3238,~
+## $ total_HU.2016          &lt;int&gt; 2624, 1079, 1925, 1969, 2880, 942, 757, 2729, 1~
+## $ total_vacant.2016      &lt;int&gt; 319, 129, 160, 299, 500, 68, 81, 452, 109, 363,~
+## $ med_HH_Income.2016     &lt;int&gt; 103772, 50455, 93036, 57604, 70038, 40568, 7125~
+## $ total_White.2016       &lt;int&gt; 3020, 825, 2740, 1605, 2721, 1126, 991, 2138, 1~
+## $ total_GradDeg.2016     &lt;int&gt; 1094, 455, 1075, 847, 1147, 409, 548, 1333, 743~
+## $ vacancyPct.2016        &lt;dbl&gt; 0.12157012, 0.11955514, 0.08311688, 0.15185373,~
+## $ pctWhite.2016          &lt;dbl&gt; 0.7582224, 0.3500212, 0.8265460, 0.6095708, 0.8~
+## $ change_med_HH_Income   &lt;dbl&gt; 23375.771, 2884.947, 20855.396, 33573.518, 1498~
+## $ change_Grad_Degree_Pct &lt;dbl&gt; -0.043750978, 0.058365438, -0.055476303, 0.1098~
+## $ pointBreeze            &lt;chr&gt; &quot;REST OF PHILADELPHIA&quot;, &quot;REST OF PHILADELPHIA&quot;,~</code></pre>
 </div>
 </div>
 <div id="manipulating-data-with-dplyr" class="section level1">
 <h1>Manipulating Data with dplyr</h1>
-<div id="piping-commands" class="section level2">
-<h2>Piping Commands</h2>
+<div id="setting-up-data-wrangling-pipelines" class="section level2">
+<h2>Setting Up Data Wrangling Pipelines</h2>
+<p>What does the pipe do?</p>
+<p>Here’s an example…</p>
 </div>
 <div id="dplyr-commands" class="section level2">
 <h2>Dplyr commands</h2>
 <p><code>mutate</code> makes a new column</p>
 <p><code>select</code> keeps only certain columns that you name</p>
 <p><code>rename</code> changes the name of a column</p>
+<p>doing an ifelse or case_when</p>
 </div>
 <div id="summarizing-data" class="section level2">
 <h2>Summarizing Data</h2>
+<p>group_by and summarize</p>
 </div>
 <div id="querying-data" class="section level2">
 <h2>Querying Data</h2>
@@ -402,36 +440,27 @@ median(vector2)</code></pre>
 </div>
 <div id="making-plots-with-ggplot2" class="section level1">
 <h1>Making Plots with ggplot2</h1>
+<p>Here are 2-3 kinds of plots</p>
+<p>Making your own graphics recipes</p>
+<p>Facets, Wide data and long data</p>
 </div>
 <div id="vector-gis-with-sf" class="section level1">
 <h1>Vector GIS With sf</h1>
-<div id="loading-data-1" class="section level2">
-<h2>Loading Data</h2>
-</div>
-<div id="making-maps-with-ggplot2" class="section level2">
-<h2>Making Maps with ggplot2</h2>
-</div>
-<div id="projections" class="section level2">
-<h2>Projections</h2>
-</div>
-<div id="vector-geoprocessing" class="section level2">
-<h2>Vector Geoprocessing</h2>
-</div>
+<p>Loading Data</p>
+<p>Making Maps with ggplot2</p>
+<p>Projections</p>
+<p>Vector Geoprocessing</p>
 </div>
 <div id="tidycensus" class="section level1">
 <h1>Tidycensus</h1>
+<p>Grab some data with tidycensus</p>
 </div>
 <div id="r-markdown" class="section level1">
 <h1>R Markdown</h1>
 <p>I will probably be asking you to turn in assignments using R Markdown. Markdown is a way to present your code-based projects as a more polished document. For more details on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
-<div id="global-options" class="section level2">
-<h2>Global Options</h2>
-</div>
-<div id="chunk-options" class="section level2">
-<h2>Chunk Options</h2>
-</div>
-<div id="kable-tables-in-r-markdown" class="section level2">
-<h2>Kable Tables in R Markdown</h2>
+<div id="markdown-to-do" class="section level2">
+<h2>markdown to do</h2>
+<p>Global Options, Chunk Options, kable tables</p>
 </div>
 </div>
 <div id="querying-apis" class="section level1">
@@ -440,33 +469,14 @@ median(vector2)</code></pre>
 </div>
 <div id="other-spatial-packages" class="section level1">
 <h1>Other Spatial Packages</h1>
-<div id="mapview-leaflet" class="section level2">
-<h2>Mapview &amp; Leaflet</h2>
-<p>…</p>
-</div>
-<div id="raster" class="section level2">
-<h2>Raster</h2>
-<p>…</p>
-</div>
-<div id="open-street-map" class="section level2">
-<h2>Open Street Map</h2>
-<p>…</p>
-</div>
+<p>Mapview, Leaflet, osmdata, raster</p>
 </div>
 <div id="project-workflows---github-and-r-projects" class="section level1">
 <h1>Project Workflows - Github and R Projects</h1>
-<div id="github" class="section level2">
-<h2>Github</h2>
+<p>Github, R Projects, Writing Readable Code</p>
 </div>
-<div id="r-projects" class="section level2">
-<h2>R Projects</h2>
-</div>
-<div id="writing-readable-code" class="section level2">
-<h2>Writing Readable Code</h2>
-</div>
-</div>
-<div id="resources-and-books" class="section level1">
-<h1>Resources and books</h1>
+<div id="resources-and-texts" class="section level1">
+<h1>Resources and texts</h1>
 <div id="troubleshooting---how-to-ask-a-question" class="section level2">
 <h2>Troubleshooting - How to ask a question</h2>
 <p>It’s super important to know how to ask a good question on the internet or on the class forum about some issue you are having. Googling around is a really good way to find help - so you can google something about the error you are having, or look on <a href="https://stackoverflow.com">https://stackoverflow.com</a>, which is a community of people doing Q&amp;A and troubleshooting.</p>
@@ -482,7 +492,9 @@ median(vector2)</code></pre>
 <ul>
 <li><p>ggplot Cheat Sheet</p></li>
 <li><p>dplyr Cheat Sheet</p></li>
-<li></li>
+<li><p>sf</p></li>
+<li><p>R markdown</p></li>
+<li><p>lubridate</p></li>
 </ul>
 </div>
 <div id="style-guides" class="section level2">
@@ -495,7 +507,12 @@ median(vector2)</code></pre>
 </div>
 <div id="books" class="section level2">
 <h2>Books</h2>
-<p>Data Visualization - Kieran Healy R for Data Science - Hadley Wickham Robin Lovelace Ken Steif Kyle Walker Paula Moraga</p>
+<p>Data Visualization - Kieran Healy</p>
+<p>R for Data Science - Hadley Wickham</p>
+<p>Robin Lovelace</p>
+<p>Ken Steif</p>
+<p>Kyle Walker</p>
+<p>Paula Moraga</p>
 </div>
 </div>
 
