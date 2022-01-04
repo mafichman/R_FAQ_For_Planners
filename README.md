@@ -4,8 +4,8 @@ For years, I've been teaching data analysis, statistical modeling, and spatial a
 
 This is a working document designed to give a basic introduction to R and compile frequently asked questions that come up in class. It will be updated on an ongoing basis, and might look like a total construction site at times.
 
-- Michael Fichman
-Lecturer
-Interim Program Director, Masters of Urban Spatial Analytics
-Researcher, PennPraxis
-University of Pennsylvania Weitzman School of Design
+- Michael Fichman<br>
+Lecturer <br>
+Interim Program Director, Masters of Urban Spatial Analytics<br>
+Researcher, PennPraxis<br>
+University of Pennsylvania Weitzman School of Design<br>
