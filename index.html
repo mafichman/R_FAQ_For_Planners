@@ -250,14 +250,15 @@ div.tocify {
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
 <p><em>For years, I’ve been teaching data analysis, statistical modeling, and spatial analysis to Urban Planning and Spatial Analytics graduate students using the software language R. It’s always a challenge to get students started with some basics so that we can move quickly to applied methods and concepts.</em></p>
+<p><em>This is a working document designed to give a basic introduction to R and compile frequently asked questions about basic operations. This isn’t really a “coding” tutorial, it’s a way to starter kit and reference document that demonstrates some simple Excel or ArcGIS-like tasks - loading spreadsheets and spatial data, creating new columns of data, summarizing and querying data, making charts and maps. </em></p>
+<p><em>This document will be updated on an ongoing basis - apologies if it looks like a construction site at times).</em></p>
+<p><em>Use the table of contents at left to navigate through the document - the simplest topics are first (e.g. “What is R?”). There are references to other books and materials at the end of the doc.</em></p>
 <p><strong>Michael Fichman</strong></p>
-<p>*Lecturer, Department of City and Regional Planning</p>
-<p>Interim Program Director, Masters of Urban Spatial Analytics</p>
-<p>University of Pennsylvania Weitzman School of Design*</p>
-<hr />
-<p>This is a working document designed to give a basic introduction to R and compile frequently asked questions about basic operations that come up in class. This isn’t really a “coding” tutorial, it’s a way to demonstrate some simple Excel or ArcGIS-like tasks - loading spreadsheets and spatial data, creating new columns of data, summarizing and querying data, making charts and maps.</p>
-<p>This is <em>not</em> an in-depth guide or series of exercises, it’s more of a starter kit and reference document. It is designed to support the exercises and assignments I have assigned you in class. It will be updated on an ongoing basis (and might look like a total construction site at times).</p>
-<p>Use the table of contents at left to navigate through the document - the simplest topics are first (e.g. “What is R?”) and the more advanced stuff comes later (e.g. “Using github”). There are references to other books and materials at the end of the doc.</p>
+<p><em>Lecturer, Department of City and Regional Planning</em></p>
+<p><em>Interim Program Director, Masters of Urban Spatial Analytics</em></p>
+<p><em>Researcher, PennPraxis</em></p>
+<p><em>Data Scientist - Center for Safe Mobility</em></p>
+<p><em>University of Pennsylvania Weitzman School of Design</em></p>
 </div>
 <div id="getting-started-with-r" class="section level1">
 <h1>Getting Started with R</h1>
@@ -319,7 +320,8 @@ div.tocify {
 <li><p>Code without the <code>#</code> will run - either as written in the console or by hitting ctrl+enter on code the code window</p></li>
 </ul>
 <p>R is case sensitive - many of your issues can be resolved by checking your syntax. You might get some kind of error because you created a data set called <code>derp</code> and you try to call it in the code with <code>DERP</code>. Happens <em>all the time</em>.</p>
-<p><em>If this is your first time using R, you might want to try out a .R script called <code>running_code_in_R.R</code> which (you can find here).[<a href="https://github.com/mafichman/R_FAQ_For_Planners/blob/main/R/running_code_in_R.R" class="uri">https://github.com/mafichman/R_FAQ_For_Planners/blob/main/R/running_code_in_R.R</a>] . It has some simple code and simple operations you can try - download the .R file, load it into your R Studio and follow the instructions to create some simple objects.</em></p>
+<p>TUTORIAL:</p>
+<p><strong>If this is your first time using R, you might want to try out a .R script called <code>running_code_in_R.R</code> which <a href="https://github.com/mafichman/R_FAQ_For_Planners/blob/main/R/running_code_in_R.R">you can find here</a>. It has some simple code and simple operations you can try - download the .R file, load it into your R Studio and follow the instructions to create some simple objects.</strong></p>
 <div id="naming-variables-and-data-sets" class="section level2">
 <h2>Naming Variables and Data Sets</h2>
 <p>Most pieces of data you load into R or create with R will have a name. If you load in a spreadsheet, you will want to give it a name so it shows up in my R environment. You can assign information to a variable using this sign “&lt;-”</p>
@@ -371,7 +373,7 @@ median(vector2)</code></pre>
 <div id="loading-data" class="section level1">
 <h1>Loading Data</h1>
 <p>Most projects will start with you loading some spreadsheet-like data - from a survey you conducted, from an excel sheet, from the Census’ website, from a shapefile that I gave you for class. For non-spatial data, these spreadsheet-like data will be in a format called a “data frame” (or as a variant called a “tibble).</p>
-<p>There are a lot of file types you can load, and some of them have their own functions, like you can read in Excel data with the <code>read_excel</code> function in the <code>readxl</code> package. Later on I will show you how to read in a .shp.</p>
+<p>There are a lot of file types you can load, and some of them have their own functions, like you can read in Excel data with the <code>read_excel</code> function in the <code>readxl</code> package. Later on I will show you how to read in a .shp. (You can read more about these data import functionalities <a href="https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-import.pdf">here.</a>)</p>
 <p>There are several ways to load data into your R environment.</p>
 <div id="loading-data-from-your-computer" class="section level2">
 <h2>Loading Data From Your Computer</h2>
@@ -420,25 +422,55 @@ median(vector2)</code></pre>
 <p><code>dplyr</code> is the core data wrangling package in “tidy” R. You can use functions from <code>dplyr</code> to manipulate data frames.</p>
 <p>You can make new columns, and remove or rename columns from your data frame. You can summarize data (e.g. what is the sum of all the rows in a given column). You can filter data to keep only rows that meet some criteria.</p>
 <p>It does lots of other stuff too.</p>
+<p>There is a handy guide for all the dplyr data tools at <a href="https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-transformation.pdf">R Studio’s dplyr cheat sheet</a>.</p>
+<div id="using-the-pipe" class="section level2">
+<h2>Using the “Pipe”</h2>
+<p><em>Very important</em>, to what I’m about to show you from here on out is a thingy called a “pipe” - <code>%&gt;%</code> - which is an object you put in your code to chain functions together and make kind of data-wrangling recipes.</p>
+<p>To understand what the pipe does, think about the following “recipe” like this: I make an <code>omlette</code> by taking a data frame called <code>eggs</code> and applying the functions <code>scramble</code> and <code>fry</code></p>
+<p><code>omlette &lt;- eggs %&gt;% scramble() %&gt;% fry()</code></p>
+<p>OK, keep that in mind while we look at <code>dplyr</code> commands.</p>
+</div>
 <div id="dplyr-commands" class="section level2">
 <h2>Dplyr commands</h2>
-<p><code>mutate</code> makes a new column</p>
-<p><code>select</code> keeps only certain columns that you name</p>
-<p><code>rename</code> changes the name of a column</p>
-<p><code>filter</code></p>
-<p>doing an ifelse or case_when</p>
+<p>Let’s use a few basic <code>dplyr</code> commands to wrangle our dataframe <code>myData</code>.</p>
+<div id="mutate" class="section level3">
+<h3>Mutate</h3>
+<p><code>mutate</code> makes a new column. I am going to <em>overwrite</em> <code>myData</code> - making a new version that has a new column in it. Each row of the data frame represents a census tract, and I’d like to see what the difference is in tract population between 2010 and 2016. I’ll call this new column <code>pop_change</code> and set its value equal to <code>total_pop.2016</code> minus <code>total_pop.2010</code>. Note the pipe used to “chain” the mutate statement in there.</p>
+<pre class="r"><code>myData &lt;- myData %&gt;%
+  mutate(pop_change = total_pop.2016 - total_pop.2010)</code></pre>
+<p>Did it work? Try typing <code>View(myData)</code> or <code>glimpse(myData)</code> into your console.</p>
+<p>I’m now going to create a second variable called <code>pop_change_positive</code> using <code>mutate</code>. If the population change was positive, I’m going to call set this variable equal to <code>TRUE</code> - I’ll do an <code>ifelse</code> statement to make it’s value contingent on the value of <code>pop_change</code>.</p>
+<pre class="r"><code>myData &lt;- myData %&gt;%
+  mutate(pop_change_positive = ifelse(pop_change &gt; 0, TRUE, FALSE))</code></pre>
+</div>
+<div id="filter" class="section level3">
+<h3>Filter</h3>
+<p><code>filter</code> lets you reduce your data frame based on some criteria. I’d like to create a new data frame called <code>population_loss</code> that consists only of census tracts in <code>myData</code> that lost population (e.g. pop_change_positive == FALSE).</p>
+<pre class="r"><code>population_loss &lt;- myData %&gt;%
+  filter(pop_change_positive == FALSE)</code></pre>
+<p>I can do this kind of filtering based on lots of criteria.</p>
+</div>
+<div id="select" class="section level3">
+<h3>Select</h3>
+<p><code>select</code> keeps only certain columns that you want to keep.</p>
+<p>I’m going to make a new data frame, called <code>twoVariables</code> that consists of only the columns <code>NAME.y</code> and <code>GEOID</code> from the data frame <code>myData</code></p>
+<pre class="r"><code>twoVariables &lt;- myData %&gt;%
+  select(NAME.y, GEOID)</code></pre>
+</div>
+<div id="rename" class="section level3">
+<h3>Rename</h3>
+<p><code>rename</code> changes the names of your columns. I’d like to rename the column from the data frame <code>twoVariables</code> called <code>NAME.y</code> to be called just <code>NAME</code></p>
+<pre class="r"><code>twoVariables &lt;- twoVariables %&gt;%
+  rename(NAME = NAME.y)</code></pre>
+</div>
 </div>
 <div id="summarizing-data" class="section level2">
 <h2>Summarizing Data</h2>
-<p>group_by and summarize</p>
+<p>TBD incl - group_by and summarize</p>
 </div>
 <div id="querying-data" class="section level2">
 <h2>Querying Data</h2>
-<p>How long is it, how wide is it. glimpse, etc</p>
-</div>
-<div id="setting-up-data-wrangling-pipelines" class="section level2">
-<h2>Setting Up Data Wrangling Pipelines</h2>
-<p><code>dplyr</code> has a special character in it called a “pipe” that looks like this: <code>%&gt;%</code></p>
+<p>TBD</p>
 </div>
 <div id="joining-data" class="section level2">
 <h2>Joining Data</h2>
@@ -446,16 +478,11 @@ median(vector2)</code></pre>
 </div>
 <div id="making-plots-with-ggplot2" class="section level1">
 <h1>Making Plots with ggplot2</h1>
-<p>Here are 2-3 kinds of plots</p>
-<p>Making your own graphics recipes</p>
-<p>Facets, Wide data and long data</p>
+<p>TBD incl - Facets, Wide data and long data</p>
 </div>
 <div id="vector-gis-with-sf" class="section level1">
 <h1>Vector GIS With sf</h1>
-<p>Loading Data</p>
-<p>Making Maps with ggplot2</p>
-<p>Projections</p>
-<p>Vector Geoprocessing</p>
+<p>TBD incl -Loading Data, Making Maps with ggplot2, Projections, Vector Geoprocessing</p>
 </div>
 <div id="tidycensus" class="section level1">
 <h1>Tidycensus</h1>
@@ -463,15 +490,14 @@ median(vector2)</code></pre>
 </div>
 <div id="r-markdown" class="section level1">
 <h1>R Markdown</h1>
-<p>I will probably be asking you to turn in assignments using R Markdown. Markdown is a way to present your code-based projects as a more polished document. For more details on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
-<div id="markdown-to-do" class="section level2">
-<h2>markdown to do</h2>
-<p>Global Options, Chunk Options, kable tables</p>
-</div>
+<p>TBD</p>
+<p>I will probably be asking you to turn in assignments using R Markdown. Markdown is a way to present your code-based projects as a more polished document (you’re reading a markdown right now!). For more details on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
+<p>If you want to see how markdown works - you can find a download button at the top right of this document and download the code that was used to make this.</p>
+<p>TBD incl - Global Options, Chunk Options, kable tables</p>
 </div>
 <div id="querying-apis" class="section level1">
 <h1>Querying APIs</h1>
-<p>Some data are served on the web in APIs or Application Programming Interfaces, where you can get custom queries for data sets. Check out Socrata and REST API query functionalities for R.</p>
+<p>TBD incl - Socrata and REST API query functionalities for R.</p>
 </div>
 <div id="other-spatial-packages" class="section level1">
 <h1>Other Spatial Packages</h1>
@@ -494,31 +520,33 @@ median(vector2)</code></pre>
 </div>
 <div id="r-cheat-sheets" class="section level2">
 <h2>R Cheat Sheets</h2>
-<p>R Studio’s website has some really good “cheat sheets” with simple walkthroughs of basic functions in some core packages</p>
+<p>R Studio’s website has some really good <a href="https://www.rstudio.com/resources/cheatsheets/">cheat sheets</a> with simple walkthroughs of basic functions in some core packages</p>
 <ul>
-<li><p>ggplot Cheat Sheet</p></li>
-<li><p>dplyr Cheat Sheet</p></li>
-<li><p>sf</p></li>
-<li><p>R markdown</p></li>
-<li><p>lubridate</p></li>
+<li><p><a href="https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-visualization.pdf">ggplot2 - graphics and plots</a></p></li>
+<li><p><a href="https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-transformation.pdf">dplyr - manipulating data frames</a></p></li>
+<li><p><a href="https://raw.githubusercontent.com/rstudio/cheatsheets/main/sf.pdf">sf - vector GIS</a></p></li>
+<li><p><a href="https://raw.githubusercontent.com/rstudio/cheatsheets/main/rmarkdown.pdf">R markdown - document publishing, includes knitr</a></p></li>
+<li><p><a href="https://raw.githubusercontent.com/rstudio/cheatsheets/main/lubridate.pdf">lubridate - dates and times</a></p></li>
+<li><p><a href="https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-import.pdf">(readr - loading data)</a></p></li>
 </ul>
 </div>
 <div id="style-guides" class="section level2">
 <h2>Style Guides</h2>
 <p>Handy tips for making your code readable</p>
 <ul>
-<li><p><a href="R%20Style%20Guide">https://google.github.io/styleguide/Rguide.html</a></p></li>
-<li><p><a href="Tidyverse%20Style%20Guide">https://style.tidyverse.org/</a></p></li>
+<li><p><a href="https://google.github.io/styleguide/Rguide.html">R Style Guide</a></p></li>
+<li><p><a href="https://style.tidyverse.org/">Tidyverse Style Guide</a></p></li>
 </ul>
 </div>
 <div id="books" class="section level2">
 <h2>Books</h2>
-<p>Data Visualization - Kieran Healy</p>
-<p>R for Data Science - Hadley Wickham</p>
-<p>Robin Lovelace</p>
-<p>Ken Steif</p>
-<p>Kyle Walker</p>
-<p>Paula Moraga</p>
+<p>If you’re in a class with me - these books are likely to be among the required or supplemental readings. They are all fantastic, open source, and extremely, extremely useful. Here they are in “bookdown” form for free.</p>
+<p><a href="https://r4ds.had.co.nz/">R for Data Science - Hadley Wickham</a> - Text for CPLN 675</p>
+<p><a href="https://urbanspatial.github.io/PublicPolicyAnalytics/">Public Policy Analytics - Ken Steif</a> - Text for MUSA 508</p>
+<p><a href="https://socviz.co/">Data Visualization - Kieran Healy</a></p>
+<p><a href="https://geocompr.robinlovelace.net/">Geocomputation with R - Robin Lovelace</a></p>
+<p><a href="https://walker-data.com/census-r/">Analyzing US Census Data - Kyle Walker</a></p>
+<p><a href="https://www.paulamoraga.com/book-geospatial/">Geospatial Health Data - Paula Moraga</a></p>
 </div>
 </div>
 

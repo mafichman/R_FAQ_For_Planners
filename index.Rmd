@@ -17,21 +17,23 @@ knitr::opts_chunk$set(echo = TRUE)
 
 *For years, I've been teaching data analysis, statistical modeling, and spatial analysis to Urban Planning and Spatial Analytics graduate students using the software language R. It's always a challenge to get students started with some basics so that we can move quickly to applied methods and concepts.*
 
+*This is a working document designed to give a basic introduction to R and compile frequently asked questions about basic operations. This isn't really a "coding" tutorial, it's a way to starter kit and reference document that demonstrates some simple Excel or ArcGIS-like tasks - loading spreadsheets and spatial data, creating new columns of data, summarizing and querying data, making charts and maps. *
+
+*This document will be updated on an ongoing basis - apologies if it looks like a construction site at times).*
+
+*Use the table of contents at left to navigate through the document - the simplest topics are first (e.g. "What is R?"). There are references to other books and materials at the end of the doc.*
+
 **Michael Fichman**
 
-*Lecturer, Department of City and Regional Planning
+*Lecturer, Department of City and Regional Planning*
 
-Interim Program Director, Masters of Urban Spatial Analytics
+*Interim Program Director, Masters of Urban Spatial Analytics*
 
-University of Pennsylvania Weitzman School of Design*
+*Researcher, PennPraxis*
 
-----
+*Data Scientist - Center for Safe Mobility*
 
-This is a working document designed to give a basic introduction to R and compile frequently asked questions about basic operations that come up in class. This isn't really a "coding" tutorial, it's a way to demonstrate some simple Excel or ArcGIS-like tasks - loading spreadsheets and spatial data, creating new columns of data, summarizing and querying data, making charts and maps. 
-
-This is *not* an in-depth guide or series of exercises, it's more of a starter kit and reference document. It is designed to support the exercises and assignments I have assigned you in class. It will be updated on an ongoing basis (and might look like a total construction site at times).
-
-Use the table of contents at left to navigate through the document - the simplest topics are first (e.g. "What is R?") and the more advanced stuff comes later (e.g. "Using github"). There are references to other books and materials at the end of the doc.
+*University of Pennsylvania Weitzman School of Design*
 
 # Getting Started with R
 
@@ -103,7 +105,9 @@ Usually, I will give you a bunch of code in class, and you will have to adapt th
 
 R is case sensitive - many of your issues can be resolved by checking your syntax. You might get some kind of error because you created a data set called `derp` and you try to call it in the code with `DERP`. Happens *all the time*.
 
-*If this is your first time using R, you might want to try out a .R script called `running_code_in_R.R` which (you can find here).[https://github.com/mafichman/R_FAQ_For_Planners/blob/main/R/running_code_in_R.R] . It has some simple code and simple operations you can try - download the .R file, load it into your R Studio and follow the instructions to create some simple objects.*
+TUTORIAL:
+
+**If this is your first time using R, you might want to try out a .R script called `running_code_in_R.R` which [you can find here](https://github.com/mafichman/R_FAQ_For_Planners/blob/main/R/running_code_in_R.R). It has some simple code and simple operations you can try - download the .R file, load it into your R Studio and follow the instructions to create some simple objects.**
 
 ## Naming Variables and Data Sets
 
@@ -178,7 +182,7 @@ For work in our class, you should load up the tidyverse on every project. Most o
 
 Most projects will start with you loading some spreadsheet-like data - from a survey you conducted, from an excel sheet, from the Census' website, from a shapefile that I gave you for class. For non-spatial data, these spreadsheet-like data will be in a format called a "data frame" (or as a variant called a "tibble).
 
-There are a lot of file types you can load, and some of them have their own functions, like you can read in Excel data with the `read_excel` function in the `readxl` package. Later on I will show you how to read in a .shp.
+There are a lot of file types you can load, and some of them have their own functions, like you can read in Excel data with the `read_excel` function in the `readxl` package. Later on I will show you how to read in a .shp. (You can read more about these data import functionalities [here.](https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-import.pdf))
 
 There are several ways to load data into your R environment.
 
@@ -216,50 +220,93 @@ You can make new columns, and remove or rename columns from your data frame. You
 
 It does lots of other stuff too.
 
+There is a handy guide for all the dplyr data tools at [R Studio's dplyr cheat sheet](https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-transformation.pdf).
+
+## Using the "Pipe"
+
+*Very important*, to what I'm about to show you from here on out is a thingy called a "pipe" - `%>%` - which is an object you put in your code to chain functions together and make kind of data-wrangling recipes.
+
+To understand what the pipe does, think about the following "recipe" like this: I make an `omlette` by taking a data frame called `eggs` and applying the functions `scramble` and `fry`
+
+`omlette <- eggs %>% scramble() %>% fry()`
+
+OK, keep that in mind while we look at `dplyr` commands.
 
 ## Dplyr commands
 
-`mutate` makes a new column
+Let's use a few basic `dplyr` commands to wrangle our dataframe `myData`.
 
-`select` keeps only certain columns that you name
+### Mutate
 
-`rename` changes the name of a column
+`mutate` makes a new column. I am going to *overwrite* `myData` - making a new version that has a new column in it. Each row of the data frame represents a census tract, and I'd like to see what the difference is in tract population between 2010 and 2016. I'll call this new column `pop_change` and set its value equal to `total_pop.2016` minus `total_pop.2010`. Note the pipe used to "chain" the mutate statement in there.
 
-`filter`
+```{r mutate_first}
 
-doing an ifelse or case_when
+myData <- myData %>%
+  mutate(pop_change = total_pop.2016 - total_pop.2010)
+
+```
+
+Did it work? Try typing `View(myData)` or `glimpse(myData)` into your console.
+
+I'm now going to create a second variable called `pop_change_positive` using `mutate`. If the population change was positive, I'm going to call set this variable equal to `TRUE` - I'll do an `ifelse` statement to make it's value contingent on the value of `pop_change`.
+
+```{r mutate_second}
+
+myData <- myData %>%
+  mutate(pop_change_positive = ifelse(pop_change > 0, TRUE, FALSE))
+
+```
+
+### Filter
+
+`filter` lets you reduce your data frame based on some criteria. I'd like to create a new data frame called `population_loss` that consists only of census tracts in `myData` that lost population (e.g. pop_change_positive == FALSE).
+
+
+```{r filter}
+population_loss <- myData %>%
+  filter(pop_change_positive == FALSE)
+```
+
+I can do this kind of filtering based on lots of criteria.
+
+### Select
+
+`select` keeps only certain columns that you want to keep.
+
+I'm going to make a new data frame, called `twoVariables` that consists of only the columns `NAME.y` and `GEOID` from the data frame `myData`
+
+```{r select}
+twoVariables <- myData %>%
+  select(NAME.y, GEOID)
+```
+
+### Rename
+
+`rename` changes the names of your columns. I'd like to rename the column from the data frame `twoVariables` called `NAME.y` to be called just `NAME`
+
+```{r rename}
+twoVariables <- twoVariables %>%
+  rename(NAME = NAME.y)
+```
 
 ## Summarizing Data
 
-group_by and summarize
+TBD incl - group_by and summarize
 
 ## Querying Data
 
-How long is it, how wide is it. glimpse, etc
-
-## Setting Up Data Wrangling Pipelines
-
-`dplyr` has a special character in it called a "pipe" that looks like this: `%>%`
+TBD
 
 ## Joining Data
 
 # Making Plots with ggplot2
 
-Here are 2-3 kinds of plots
-
-Making your own graphics recipes
-
-Facets, Wide data and long data
+TBD incl - Facets, Wide data and long data
 
 # Vector GIS With sf
 
-Loading Data
-
-Making Maps with ggplot2
-
-Projections
-
-Vector Geoprocessing
+TBD incl -Loading Data, Making Maps with ggplot2, Projections, Vector Geoprocessing
 
 # Tidycensus
 
@@ -267,15 +314,17 @@ Grab some data with tidycensus
 
 # R Markdown
 
-I will probably be asking you to turn in assignments using R Markdown. Markdown is a way to present your code-based projects as a more polished document. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+TBD
 
-## markdown to do
+I will probably be asking you to turn in assignments using R Markdown. Markdown is a way to present your code-based projects as a more polished document (you're reading a markdown right now!). For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-Global Options, Chunk Options, kable tables
+If you want to see how markdown works - you can find a download button at the top right of this document and download the code that was used to make this.
+
+TBD incl - Global Options, Chunk Options, kable tables
 
 # Querying APIs
 
-Some data are served on the web in APIs or Application Programming Interfaces, where you can get custom queries for data sets. Check out Socrata and REST API query functionalities for R.
+TBD incl - Socrata and REST API query functionalities for R.
 
 # Other Spatial Packages
 
@@ -303,36 +352,40 @@ EXAMPLE GOES HERE
 
 ## R Cheat Sheets
 
-R Studio's website has some really good "cheat sheets" with simple walkthroughs of basic functions in some core packages
+R Studio's website has some really good [cheat sheets](https://www.rstudio.com/resources/cheatsheets/) with simple walkthroughs of basic functions in some core packages
 
-- ggplot Cheat Sheet
+- [ggplot2 - graphics and plots](https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-visualization.pdf)
 
-- dplyr Cheat Sheet
+- [dplyr - manipulating data frames](https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-transformation.pdf)
 
-- sf
+- [sf - vector GIS](https://raw.githubusercontent.com/rstudio/cheatsheets/main/sf.pdf)
 
-- R markdown
+- [R markdown - document publishing, includes knitr](https://raw.githubusercontent.com/rstudio/cheatsheets/main/rmarkdown.pdf)
 
-- lubridate
+- [lubridate - dates and times](https://raw.githubusercontent.com/rstudio/cheatsheets/main/lubridate.pdf)
+
+- [(readr - loading data)](https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-import.pdf)
 
 ## Style Guides
 
 Handy tips for making your code readable
 
-- [https://google.github.io/styleguide/Rguide.html](R Style Guide)
+- [R Style Guide](https://google.github.io/styleguide/Rguide.html)
 
-- [https://style.tidyverse.org/](Tidyverse Style Guide)
+- [Tidyverse Style Guide](https://style.tidyverse.org/)
 
 ## Books
 
-Data Visualization - Kieran Healy
+If you're in a class with me - these books are likely to be among the required or supplemental readings. They are all fantastic, open source, and extremely, extremely useful. Here they are in "bookdown" form for free.
 
-R for Data Science - Hadley Wickham
+[R for Data Science - Hadley Wickham](https://r4ds.had.co.nz/) - Text for CPLN 675
 
-Robin Lovelace
+[Public Policy Analytics - Ken Steif](https://urbanspatial.github.io/PublicPolicyAnalytics/) - Text for MUSA 508
 
-Ken Steif
+[Data Visualization - Kieran Healy](https://socviz.co/)
 
-Kyle Walker
+[Geocomputation with R - Robin Lovelace](https://geocompr.robinlovelace.net/)
 
-Paula Moraga
+[Analyzing US Census Data - Kyle Walker](https://walker-data.com/census-r/)
+
+[Geospatial Health Data - Paula Moraga](https://www.paulamoraga.com/book-geospatial/)
