@@ -103,6 +103,8 @@ Usually, I will give you a bunch of code in class, and you will have to adapt th
 
 R is case sensitive - many of your issues can be resolved by checking your syntax. You might get some kind of error because you created a data set called `derp` and you try to call it in the code with `DERP`. Happens *all the time*.
 
+*If this is your first time using R, you might want to try out a .R script called `running_code_in_R.R` which (you can find here).[https://github.com/mafichman/R_FAQ_For_Planners/blob/main/R/running_code_in_R.R] . It has some simple code and simple operations you can try - download the .R file, load it into your R Studio and follow the instructions to create some simple objects.*
+
 ## Naming Variables and Data Sets
 
 Most pieces of data you load into R or create with R will have a name. If you load in a spreadsheet, you will want to give it a name so it shows up in my R environment.  You can assign information to a variable using this sign "<-"
