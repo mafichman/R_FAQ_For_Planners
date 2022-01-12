@@ -250,7 +250,7 @@ div.tocify {
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
 <p><em>For years, I’ve been teaching data analysis, statistical modeling, and spatial analysis to Urban Planning and Spatial Analytics graduate students using the software language R. It’s always a challenge to get students started with some basics so that we can move quickly to applied methods and concepts.</em></p>
-<p><em>This is a working document designed to give a basic introduction to R and compile frequently asked questions about basic operations. This isn’t really a “coding” tutorial, it’s a way to starter kit and reference document that demonstrates some simple Excel or ArcGIS-like tasks - loading spreadsheets and spatial data, creating new columns of data, summarizing and querying data, making charts and maps. </em></p>
+<p><em>This is a working document designed to give a basic introduction to R and compile frequently asked questions about basic operations. This isn’t really a “coding” tutorial, it’s a starter kit that demonstrates some simple Excel or ArcGIS-like tasks - loading spreadsheets and spatial data, creating new columns of data, summarizing and querying data, making charts and maps. </em></p>
 <p><em>This document will be updated on an ongoing basis - apologies if it looks like a construction site at times).</em></p>
 <p><em>Use the table of contents at left to navigate through the document - the simplest topics are first (e.g. “What is R?”). There are references to other books and materials at the end of the doc.</em></p>
 <p><strong>Michael Fichman</strong></p>
@@ -471,11 +471,23 @@ median(vector2)</code></pre>
 </div>
 <div id="summarizing-data" class="section level2">
 <h2>Summarizing Data</h2>
-<p>TBD incl - group_by and summarize</p>
-</div>
-<div id="querying-data" class="section level2">
-<h2>Querying Data</h2>
-<p>TBD</p>
+<p>You’ll often want to know about the characteristics or central tendencies of your data. Using the <code>group_by</code> and <code>summarize</code> commands you can do lots of this.</p>
+<p>Here are some examples - notice I’m not creating new data frames here.</p>
+<p>First, let’s just find out what the median <code>pop_change</code> was between 2010 and 2016 for Philadelphia census tracts.</p>
+<pre class="r"><code>myData %&gt;%
+  summarize(median_pop_change = median(pop_change))</code></pre>
+<pre><code>##   median_pop_change
+## 1               133</code></pre>
+<p>What if we want to know how one type of tract versus another varied in terms of <code>pop_change</code>? We can group our data into categories using <code>group_by</code> and then summarize.</p>
+<p>For tracts for which <code>pop_change_positive</code> (remember we created this column as a TRUE/FALSE - was there population change between 2010 and 2016?) what is the median <code>pop_change</code>?</p>
+<pre class="r"><code>myData %&gt;%
+  group_by(pop_change_positive) %&gt;%
+  summarize(median_pop_change = median(pop_change))</code></pre>
+<pre><code>## # A tibble: 2 x 2
+##   pop_change_positive median_pop_change
+##   &lt;lgl&gt;                           &lt;dbl&gt;
+## 1 FALSE                            -332
+## 2 TRUE                              352</code></pre>
 </div>
 <div id="joining-data" class="section level2">
 <h2>Joining Data</h2>
@@ -546,13 +558,19 @@ median(vector2)</code></pre>
 <div id="books" class="section level2">
 <h2>Books</h2>
 <p>If you’re in a class with me - these books are likely to be among the required or supplemental readings. They are all fantastic, open source, and extremely, extremely useful. Here they are in “bookdown” form for free.</p>
-<p><a href="https://r4ds.had.co.nz/">R for Data Science - Hadley Wickham</a> - Text for CPLN 675</p>
-<p><a href="https://urbanspatial.github.io/PublicPolicyAnalytics/">Public Policy Analytics - Ken Steif</a> - Text for MUSA 508</p>
-<p><a href="https://socviz.co/">Data Visualization - Kieran Healy</a></p>
-<p><a href="https://geocompr.robinlovelace.net/">Geocomputation with R - Robin Lovelace</a></p>
-<p><a href="https://walker-data.com/census-r/">Analyzing US Census Data - Kyle Walker</a></p>
-<p><a href="https://www.paulamoraga.com/book-geospatial/">Geospatial Health Data - Paula Moraga</a></p>
+<ul>
+<li><p><a href="https://r4ds.had.co.nz/">R for Data Science - Hadley Wickham</a> - Text for CPLN 675</p></li>
+<li><p><a href="https://urbanspatial.github.io/PublicPolicyAnalytics/">Public Policy Analytics - Ken Steif</a> - Text for MUSA 508</p></li>
+<li><p><a href="https://socviz.co/">Data Visualization - Kieran Healy</a></p></li>
+<li><p><a href="https://geocompr.robinlovelace.net/">Geocomputation with R - Robin Lovelace</a></p></li>
+<li><p><a href="https://walker-data.com/census-r/">Analyzing US Census Data - Kyle Walker</a></p></li>
+<li><p><a href="https://www.paulamoraga.com/book-geospatial/">Geospatial Health Data - Paula Moraga</a></p></li>
+</ul>
 </div>
+</div>
+<div id="faq" class="section level1">
+<h1>FAQ</h1>
+<p>Common Q&amp;A will go here</p>
 </div>
 
 

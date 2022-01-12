@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 *For years, I've been teaching data analysis, statistical modeling, and spatial analysis to Urban Planning and Spatial Analytics graduate students using the software language R. It's always a challenge to get students started with some basics so that we can move quickly to applied methods and concepts.*
 
-*This is a working document designed to give a basic introduction to R and compile frequently asked questions about basic operations. This isn't really a "coding" tutorial, it's a way to starter kit and reference document that demonstrates some simple Excel or ArcGIS-like tasks - loading spreadsheets and spatial data, creating new columns of data, summarizing and querying data, making charts and maps. *
+*This is a working document designed to give a basic introduction to R and compile frequently asked questions about basic operations. This isn't really a "coding" tutorial, it's a starter kit that demonstrates some simple Excel or ArcGIS-like tasks - loading spreadsheets and spatial data, creating new columns of data, summarizing and querying data, making charts and maps. *
 
 *This document will be updated on an ongoing basis - apologies if it looks like a construction site at times).*
 
@@ -307,11 +307,26 @@ twoVariables <- twoVariables %>%
 
 ## Summarizing Data
 
-TBD incl - group_by and summarize
+You'll often want to know about the characteristics or central tendencies of your data. Using the `group_by` and `summarize` commands you can do lots of this.
 
-## Querying Data
+Here are some examples - notice I'm not creating new data frames here.
 
-TBD
+First, let's just find out what the median `pop_change` was between 2010 and 2016 for Philadelphia census tracts.
+
+```{r summarize_1}
+myData %>%
+  summarize(median_pop_change = median(pop_change))
+```
+
+What if we want to know how one type of tract versus another varied in terms of `pop_change`? We can group our data into categories using `group_by` and then summarize.
+
+For tracts for which `pop_change_positive` (remember we created this column as a TRUE/FALSE - was there population change between 2010 and 2016?) what is the median `pop_change`?
+
+```{r summarize_2}
+myData %>%
+  group_by(pop_change_positive) %>%
+  summarize(median_pop_change = median(pop_change))
+```
 
 ## Joining Data
 
@@ -393,14 +408,18 @@ Handy tips for making your code readable
 
 If you're in a class with me - these books are likely to be among the required or supplemental readings. They are all fantastic, open source, and extremely, extremely useful. Here they are in "bookdown" form for free.
 
-[R for Data Science - Hadley Wickham](https://r4ds.had.co.nz/) - Text for CPLN 675
+- [R for Data Science - Hadley Wickham](https://r4ds.had.co.nz/) - Text for CPLN 675
 
-[Public Policy Analytics - Ken Steif](https://urbanspatial.github.io/PublicPolicyAnalytics/) - Text for MUSA 508
+- [Public Policy Analytics - Ken Steif](https://urbanspatial.github.io/PublicPolicyAnalytics/) - Text for MUSA 508
 
-[Data Visualization - Kieran Healy](https://socviz.co/)
+- [Data Visualization - Kieran Healy](https://socviz.co/)
 
-[Geocomputation with R - Robin Lovelace](https://geocompr.robinlovelace.net/)
+- [Geocomputation with R - Robin Lovelace](https://geocompr.robinlovelace.net/)
 
-[Analyzing US Census Data - Kyle Walker](https://walker-data.com/census-r/)
+- [Analyzing US Census Data - Kyle Walker](https://walker-data.com/census-r/)
 
-[Geospatial Health Data - Paula Moraga](https://www.paulamoraga.com/book-geospatial/)
+- [Geospatial Health Data - Paula Moraga](https://www.paulamoraga.com/book-geospatial/)
+
+# FAQ
+
+Common Q&A will go here
