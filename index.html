@@ -265,13 +265,13 @@ div.tocify {
 <div id="what-is-r" class="section level2">
 <h2>What is R?</h2>
 <p>R is a programming language you can use to do stuff that you can do in Excel, or ArcGIS, or stats software like SAS… but (with some practice) faster, better, and more efficiently.</p>
-<p>You can load data in spreadsheet form, make new columns, summarize it, make charts, make maps. You can also do way more complicated stuff too. Most importantly, you can set up routines or workflows to let you repeat processes that in other software would take lots of clicks and steps.</p>
+<p>You can load data in spreadsheet form, make new columns, summarize it, make charts, make maps. You can load spatial data and use R as a GIS. You can make statistical models. You can also do way more complicated stuff too. <em>Most importantly, you can set up routines or workflows to let you repeat processes that in other software would take lots of clicks and steps.</em></p>
 <p>It’s “open source,” which means it is written and maintained by a community of people like you and me. That also means that sometimes, things will go wrong and there isn’t always a manual to consult.</p>
 <p>If you’ve never programmed before, that’s OK, you’re in the right place.</p>
 </div>
 <div id="what-is-r-studio" class="section level2">
 <h2>What is R Studio?</h2>
-<p>I run R in a thing called R Studio, which is like a viewer for R. You can see plots and data sets that you’ve loaded in this program.</p>
+<p>I run R code and do projects in R Studio, which is like a viewer for R. You can write code to load and manipulate data. You can see plots and data sets that you’ve loaded using R Studio.</p>
 </div>
 <div id="installing-r-and-r-studio-for-windows-and-mac." class="section level2">
 <h2>Installing R and R Studio for Windows and Mac.</h2>
@@ -290,6 +290,8 @@ div.tocify {
 <h3>The Console</h3>
 <p>You can type and execute code in the console.</p>
 <p>I could type something like <code>myName &lt;- &quot;Michael&quot;</code> into the console, and it would create a variable called <code>myName</code> that is equal to the character string “Michael” in my “environment.”</p>
+<p>Go ahead, try it.</p>
+<pre class="r"><code>myName &lt;- &quot;Michael&quot;</code></pre>
 </div>
 <div id="the-environment" class="section level3">
 <h3>The Environment</h3>
@@ -319,6 +321,9 @@ div.tocify {
 <li><p>Code with a <code>#</code> in front of it is called “commented code.” This stuff doesn’t execute it’s where you make notes.</p></li>
 <li><p>Code without the <code>#</code> will run - either as written in the console or by hitting ctrl+enter on code the code window</p></li>
 </ul>
+<pre class="r"><code># This code doesn&#39;t do anything, but the next line does
+print(&#39;hello world&#39;)</code></pre>
+<pre><code>## [1] &quot;hello world&quot;</code></pre>
 <p>R is case sensitive - many of your issues can be resolved by checking your syntax. You might get some kind of error because you created a data set called <code>derp</code> and you try to call it in the code with <code>DERP</code>. Happens <em>all the time</em>.</p>
 <p>TUTORIAL:</p>
 <p><strong>If this is your first time using R, you might want to try out a .R script called <code>running_code_in_R.R</code> which <a href="https://github.com/mafichman/R_FAQ_For_Planners/blob/main/R/running_code_in_R.R">you can find here</a>. It has some simple code and simple operations you can try - download the .R file, load it into your R Studio and follow the instructions to create some simple objects.</strong></p>

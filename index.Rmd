@@ -41,7 +41,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 R is a programming language you can use to do stuff that you can do in Excel, or ArcGIS, or stats software like SAS... but (with some practice) faster, better, and more efficiently. 
 
-You can load data in spreadsheet form, make new columns, summarize it, make charts, make maps. You can also do way more complicated stuff too. Most importantly, you can set up routines or workflows to let you repeat processes that in other software would take lots of clicks and steps.
+You can load data in spreadsheet form, make new columns, summarize it, make charts, make maps. You can load spatial data and use R as a GIS. You can make statistical models.  You can also do way more complicated stuff too. *Most importantly, you can set up routines or workflows to let you repeat processes that in other software would take lots of clicks and steps.*
 
 It's "open source," which means it is written and maintained by a community of people like you and me. That also means that sometimes, things will go wrong and there isn't always a manual to consult.
 
@@ -49,7 +49,7 @@ If you've never programmed before, that's OK, you're in the right place.
 
 ## What is R Studio?
 
-I run R in a thing called R Studio, which is like a viewer for R. You can see plots and data sets that you've loaded in this program. 
+I run R code and do projects in R Studio, which is like a viewer for R. You can write code to load and manipulate data. You can see plots and data sets that you've loaded using R Studio. 
 
 ## Installing R and R Studio for Windows and Mac. 
 
@@ -68,6 +68,14 @@ Now open up R Studio and let's take a look at some of the components.
 You can type and execute code in the console.
 
 I could type something like `myName <- "Michael"` into the console, and it would create a variable called `myName` that is equal to the character string "Michael" in my "environment."
+
+Go ahead, try it.
+
+```{r michael}
+
+myName <- "Michael"
+
+```
 
 ### The Environment
 
@@ -102,6 +110,13 @@ Usually, I will give you a bunch of code in class, and you will have to adapt th
 - Code with a `#` in front of it is called "commented code." This stuff doesn't execute it's where you make notes.
 
 - Code without the `#` will run - either as written in the console or by hitting ctrl+enter on code the code window
+
+```{r commented}
+
+# This code doesn't do anything, but the next line does
+print('hello world')
+
+```
 
 R is case sensitive - many of your issues can be resolved by checking your syntax. You might get some kind of error because you created a data set called `derp` and you try to call it in the code with `DERP`. Happens *all the time*.
 
