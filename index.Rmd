@@ -25,6 +25,8 @@ This document will be updated on an ongoing basis (it's a construction site). Ri
 
 **Michael Fichman**
 
+*University of Pennsylvania Weitzman School of Design*
+
 *Lecturer, Department of City and Regional Planning*
 
 *Interim Program Director, Masters of Urban Spatial Analytics*
@@ -32,8 +34,6 @@ This document will be updated on an ongoing basis (it's a construction site). Ri
 *Researcher, PennPraxis*
 
 *Data Scientist - Center for Safe Mobility*
-
-*University of Pennsylvania Weitzman School of Design*
 
 # 2. Getting Started with R
 
