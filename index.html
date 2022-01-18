@@ -249,10 +249,10 @@ div.tocify {
 
 <div id="introduction" class="section level1">
 <h1>1. Introduction</h1>
-<p><em>For years, I’ve been teaching data analysis, statistical modeling, and spatial analysis to Penn Planning and Spatial Analytics grad students using the software language R. It’s always a challenge to get started with some basics so we can move quickly to applied work.</em></p>
-<p><em>This is a working document designed to give a basic introduction to R. This isn’t a “coding” tutorial, it’s a starter kit that demonstrates some simple Excel or ArcGIS-like tasks - loading spreadsheets and spatial data, creating new columns of data, summarizing and querying data, making charts and maps. </em></p>
-<p><em>Use the table of contents at left to navigate through the document - the simplest topics are first (e.g. “What is R?”). There are references to other books and materials at the end of the doc.</em></p>
-<p><em>This document will be updated on an ongoing basis - (apologies if it looks like a construction site at times). Right now, sections 1-8 are complete - which is what students in CPLN 675 will need to get up and running this spring!</em></p>
+<p>This is a working document designed to give a basic introduction to R for those who have no coding experience. This should help you get prepared for applied projects in CPLN and MUSA 500-600 level coursework within a couple of weeks. It coalesces introductory materials I’ve developed over the past five years for MUSA 508, MUSA 795, CPLN 501, and CPLN 675 and should give you what you need to get started in any of those courses.</p>
+<p>This isn’t a “coding” tutorial, it’s a starter kit that demonstrates how R can do some familiar Excel or ArcGIS-like tasks - loading spreadsheets and spatial data, creating new columns of data, summarizing and querying data, making charts and maps - and do them faster, better, and more reproducibly.</p>
+<p>Use the table of contents at left to navigate through the document - the simplest topics are first (e.g. “What is R?”, “How do I download R?”), the latter sections are more advanced (Geoprocessing, Census Data etc). There are references to books and reference materials at the end of the doc.</p>
+<p>This document will be updated on an ongoing basis (it’s a construction site). Right now, sections 1-8 are complete - which is what students in CPLN 675 will need to get up and running this spring!</p>
 <p><strong>Michael Fichman</strong></p>
 <p><em>Lecturer, Department of City and Regional Planning</em></p>
 <p><em>Interim Program Director, Masters of Urban Spatial Analytics</em></p>
@@ -265,7 +265,7 @@ div.tocify {
 <div id="what-is-r" class="section level2">
 <h2>What is R?</h2>
 <p>R is a programming language you can use to do stuff that you can do in Excel, or ArcGIS, or stats software like SAS… but (with some practice) faster, better, and more efficiently.</p>
-<p>You can load data in spreadsheet form, make new columns, summarize it, make charts, make maps. You can load spatial data and use R as a GIS. You can make statistical models. You can also do way more complicated stuff too. <em>Most importantly, you can set up routines or workflows to let you repeat processes that in other software would take lots of clicks and steps.</em></p>
+<p>You can load data in spreadsheet form, make new columns, create data summaries, make charts, make maps. You can load spatial data and use R as a GIS. You can make statistical models. You can also do way more complicated stuff too. <em>Most importantly, you can set up routines or workflows to let you repeat processes that in other software would take lots of clicks and steps.</em></p>
 <p>It’s “open source,” which means it is written and maintained by a community of people like you and me. That also means that sometimes, things will go wrong and there isn’t always a manual to consult.</p>
 <p>If you’ve never programmed before, that’s OK, you’re in the right place.</p>
 </div>
@@ -701,6 +701,7 @@ library(sf)</code></pre>
 </div>
 <div id="resources-and-texts" class="section level1">
 <h1>14. Resources and texts</h1>
+<p>This section contains online resources for learning R and troubleshooting code-based problems.</p>
 <div id="troubleshooting---how-to-ask-a-question" class="section level2">
 <h2>Troubleshooting - How to ask a question</h2>
 <p>It’s super important to know how to ask a good question on the internet or on the class forum about some issue you are having. Googling around is a really good way to find help - so you can google something about the error you are having, or look on <a href="https://stackoverflow.com">https://stackoverflow.com</a>, which is a community of people doing Q&amp;A and troubleshooting.</p>
@@ -708,10 +709,14 @@ library(sf)</code></pre>
 <p><code>??read.csv</code></p>
 <p>You can also check out the documentation about the packages, functions and the arguments they take in the Packages tab in the Viewer window in R Studio.</p>
 <p>If you are going to ask a question on the class forum, include some code, and details about your problem - like the data sources that you tried to use and how they look. This allows somebody to reproduce the issue on their own, or at least understand it.</p>
-<div id="good-example-questions" class="section level3">
-<h3>Good Example Questions</h3>
-<p>TBD</p>
-</div>
+<p><em>A good question gives your respondent lots of background info:</em></p>
+<ul>
+<li><p>What is the nature of the data in your question? Can you post a <code>glimpse</code> command so we can see what the column names and data types are?</p></li>
+<li><p>What is the code snippet that didn’t run correctly?</p></li>
+<li><p>What kind of error message did you get?</p></li>
+<li><p>What packages do you have loaded?</p></li>
+<li><p>Did you google the question before you came and asked for help? (The answer should be yes).</p></li>
+</ul>
 </div>
 <div id="r-cheat-sheets" class="section level2">
 <h2>R Cheat Sheets</h2>
