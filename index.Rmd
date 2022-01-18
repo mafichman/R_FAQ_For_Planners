@@ -13,15 +13,15 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Introduction
+# 1. Introduction
 
-*For years, I've been teaching data analysis, statistical modeling, and spatial analysis to Urban Planning and Spatial Analytics graduate students using the software language R. It's always a challenge to get students started with some basics so that we can move quickly to applied methods and concepts.*
+*For years, I've been teaching data analysis, statistical modeling, and spatial analysis to Penn Planning and Spatial Analytics grad students using the software language R. It's always a challenge to get started with some basics so we can move quickly to applied work.*
 
-*This is a working document designed to give a basic introduction to R and compile frequently asked questions about basic operations. This isn't really a "coding" tutorial, it's a starter kit that demonstrates some simple Excel or ArcGIS-like tasks - loading spreadsheets and spatial data, creating new columns of data, summarizing and querying data, making charts and maps. *
-
-*This document will be updated on an ongoing basis - apologies if it looks like a construction site at times).*
+*This is a working document designed to give a basic introduction to R. This isn't a "coding" tutorial, it's a starter kit that demonstrates some simple Excel or ArcGIS-like tasks - loading spreadsheets and spatial data, creating new columns of data, summarizing and querying data, making charts and maps. *
 
 *Use the table of contents at left to navigate through the document - the simplest topics are first (e.g. "What is R?"). There are references to other books and materials at the end of the doc.*
+
+*This document will be updated on an ongoing basis - (apologies if it looks like a construction site at times). Right now, sections 1-8 are complete - which is what students in CPLN 675 will need to get up and running this spring!*
 
 **Michael Fichman**
 
@@ -35,7 +35,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 *University of Pennsylvania Weitzman School of Design*
 
-# Getting Started with R
+# 2. Getting Started with R
 
 ## What is R?
 
@@ -62,6 +62,9 @@ I run R code and do projects in R Studio, which is like a viewer for R. You can 
 ## R Studio Orientation
 
 Now open up R Studio and let's take a look at some of the components.
+
+![Image by Kieran Healy](images/healy_gui.png)
+Your R Studio GUI (graphical user interface) should look something like this (Image by Kieran Healy)
 
 ### The Console
 
@@ -101,7 +104,7 @@ If you are writing code, you can save your code as either a .R file (just plain 
 
 -You can consult the "Packages" or "Help" tabs to find documentation about different functions and packages in the R world. (More about packages later)
 
-# Data and Coding Basics
+# 3. Data and Coding Basics
 
 How do you "run code" in R?
 
@@ -167,7 +170,7 @@ vector2 <- c(1, 4, 6, NA, 10)
 median(vector2)
 ```
 
-# Installing and Loading Packages
+# 4. Installing and Loading Packages
 
 A lot of the things you will want to do with R will require loading packages. "Base R" is basic R - there are a bunch of functions it does. Since R is open source, lots of people have developed their own cool packages that do additional stuff.
 
@@ -187,13 +190,15 @@ library(tidyverse)
 
 Packages all come with documentation - lists of functions in these packages have little vignettes that tell you how to use them.  Check that out in the "Packages" tab in your R Studio environment to see these, or just google package names or function names to find the documentation.
 
+You can also type things like `??select` in your console and documentation about the function `select` will pop up in your "Help" window in R Studio.
+
 ## The Tidyverse
 
 The `tidyverse`, which we loaded in the previous code chunk, is a group of important packages which are used to wrangle data, make graphics, load data, handle dates, handle text. Better yet, these projects are coordinated by their developers, so they all work nicely together.
 
 For work in our class, you should load up the tidyverse on every project. Most of my code doesn't work without it.
 
-# Loading Data 
+# 5. Loading and Viewing Data 
 
 Most projects will start with you loading some spreadsheet-like data - from a survey you conducted, from an excel sheet, from the Census' website, from a shapefile that I gave you for class. For non-spatial data, these spreadsheet-like data will be in a format called a "data frame" (or as a variant called a "tibble).
 
@@ -226,8 +231,17 @@ Now that you've loaded in some data, you can examine them in several ways. You c
 ```{r glimpse_myData}
 glimpse(myData)
 ```
+## Writing Data to File
 
-# Manipulating Data with dplyr
+After you manipulate data, you might want to write it out to file. Everything we are doing in the R-Studio environment does not affect the underlying data - so any project you do might need a step where you out put data.
+
+You can do this with commands like `write.csv` - so you could data your data frame `myData` and write it out as a file with a name and location of your choosing like so:
+
+`write.csv(myData, "your_file_path/your_file_name.csv")`
+
+We talk a bit later about reading/writing spatial data as well.
+
+# 6. Manipulating Data with dplyr
 
 `dplyr` is the core data wrangling package in "tidy" R. You can use functions from `dplyr` to manipulate data frames. 
 
@@ -330,21 +344,230 @@ myData %>%
 
 ## Joining Data
 
-# Making Plots with ggplot2
+Under construction
 
-TBD incl - Facets, Wide data and long data
+# 7. Making Plots with ggplot2
 
-# Tidycensus
+`ggplot2` is the main graphics library in the `tidyverse` - it's fantastic. You can make bar plots, line plots, and much more with it.
 
-Grab some data with tidycensus.
-Reference tidycensus tutorial
+You make ggplots by writing "recipes" for charts. The `+` operator is a bit like what the `%>%` is in dplyr/tidyverse - you use it to add elements together.
 
-# Vector GIS With sf
+The core elements of ggplot recipes are called geometries (a `geom`), and the way you style the data is with aesthetics (`aes`). You can add some other styles to your ggplots, but if it involves changing something about the appearance of the plot based on data, you use an `aes` call.
 
-TBD incl -Loading Data, Making Maps with ggplot2, Projections, Vector Geoprocessing
-Reference geoprocessing tutorial
+There are lots of resources for ggplot - the simplest and easiest one to check out is [R Studio's ggplot cheat sheet](https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-visualization.pdf). There is also a whole (free) book on data viz in ggplot - [Data Visualization by Kieran Healy](https://socviz.co/). It's fantastic.
 
-# R Markdown
+## Making a basic plot
+
+Let's make a simple scatterplot.
+
+Think about the "recipe" for the following chart where we see plot Philadelphia census tract median household income as a function of the tract's pencentage of vacant housing units using this narrative (remember each row in myData is a Philadelphia census tract):
+
+- Make me a ggplot
+- Add a point geometry from the data set `myData` where the x aesthetic is `vacancyPct.2016` and the y aesthetic is `med_HH_Income.2016`
+
+```{r ggplot1, warning = FALSE}
+ggplot()+
+  geom_point(data = myData, 
+             aes(x = vacancyPct.2016, y = med_HH_Income.2016))
+```
+
+## Adding more aesthetics
+
+We can add more aesthetics to this plot. Let's do this first by just tinkering with the colors to make it look cool - we will do this with some commands *outside* the aesthetics to make the points blue.
+
+```{r ggplot2, warning = FALSE}
+ggplot()+
+  geom_point(data = myData, 
+             aes(x = vacancyPct.2016, y = med_HH_Income.2016),
+             color = "blue")
+```
+
+OK, now let's make the point coloration change according to a data-related element, something we have to specify in the aesthetics. We specify the color as being equal to `pop_change_positive`:
+
+```{r ggplot3, warning = FALSE}
+ggplot()+
+  geom_point(data = myData, 
+             aes(x = vacancyPct.2016, y = med_HH_Income.2016, color = pop_change_positive))
+```
+
+## Facets
+
+You can very simply make "small multiple" plots where you subdivide your data into categories for graphic comparison. This is done with the `facet_wrap` command. 
+
+Here's an alternate take on our previous plot, cut into two plots. Notice in the code I pulled `pop_change_positive` out of the aesthetics from the previous plot and put it in the `facet_wrap` command.
+
+```{r ggplot4, warning = FALSE}
+ggplot()+
+  geom_point(data = myData, 
+             aes(x = vacancyPct.2016, y = med_HH_Income.2016))+
+  facet_wrap(~pop_change_positive)
+```
+
+## Advanced graphics
+
+You can alter most elements of the ggplot. We could take our initial scatterplot and do some things to spruce it up, like add a title, change the axis labels etc.,
+
+```{r ggplot5, warning = FALSE}
+ggplot()+
+  geom_point(data = myData, 
+             aes(x = vacancyPct.2016, y = med_HH_Income.2016))+
+  labs(title="Philadelphia Tract Med. HH Income as a Function of Pct. Vacancy",
+       subtitle = "Data: US Census Bureau, 2016 ACS 5-Year Estimates",
+        x ="Pct Vacant Housing Units (0-1)", y = "Median Household Income (2016 $)")
+```
+
+I like to make some pre-made recipes where I style the lines, fonts and other elements, and then I can just add it to my plots. Here's a recipe I call `plotTheme`. Load it up into your environment and then you can add it to your plots to make them nicer. The sky is the limit.
+
+```{r plotTheme}
+
+plotTheme <- theme(
+  plot.title =element_text(size=12),
+  plot.subtitle = element_text(size=8),
+  plot.caption = element_text(size = 6),
+  axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+  axis.text.y = element_text(size = 10),
+  axis.title.y = element_text(size = 10),
+  # Set the entire chart region to blank
+  panel.background=element_blank(),
+  plot.background=element_blank(),
+  #panel.border=element_rect(colour="#F0F0F0"),
+  # Format the grid
+  panel.grid.major=element_line(colour="#D0D0D0",size=.75),
+  axis.ticks=element_blank())
+```
+
+Now I can add `plotTheme` to my recipe from the last plot for some extra styling. Notice I just tack it onto the recipe below with a `+`:
+
+```{r ggplot6, warning = FALSE}
+ggplot()+
+  geom_point(data = myData, 
+             aes(x = vacancyPct.2016, y = med_HH_Income.2016))+
+  labs(title="Philadelphia Tract Med. HH Income as a Function of Pct. Vacancy",
+       subtitle = "Data: US Census Bureau, 2016 ACS 5-Year Estimates",
+        x ="Pct Vacant Housing Units (0-1)", y = "Median Household Income (2016 $)")+
+  plotTheme
+```
+
+# 8. Tidycensus
+
+You can access the US Census using the `tidycensus` package - this is much faster than grabbing Census data on the web. You can grab the variables you want with or without spatial data attached. 
+
+Even if you *only* use R for this - you're making your life a bit easier. You can grab data with `tidycensus`, write it to file (more on this in the next section) and then use it in Excel or ArcGIS.
+
+Here's how it works - you "tell" the census, through some R Code, that you want certain variables, for certain years, and certain geographies, and it returns it to you in your R Environment.
+
+There is a whole book on tidycensus from it's creator/maintainer (*cough cough MUSA Masterclass guest speaker 2021*) [Kyle Walker](https://walker-data.com/census-r/).
+
+## Load the tidycensus and sf packages
+
+To use `tidycensus` you should install and load the `tidycensus` package. We are going to grab some spatial data as well, so load the `sf` package.
+
+If you don't have these packages installed, you should install them as follows (if you do, skip this step):
+
+```{r install_packages, warning = FALSE, eval = FALSE}
+install.packages('tidycensus')
+install.packages('sf')
+```
+
+OK, if you have the packages installed on your computer, now load them into your R environment with a `library` call:
+
+```{r setup_packages2, warning = FALSE, message = FALSE}
+library(tidycensus)
+library(sf)
+```
+
+You will need a "key" to access the Census API. You can find one at [their website](https://api.census.gov/data/key_signup.html).
+
+Paste it into the code block below and run it to load your key in to your R environment:
+
+```{r load_key_hide, warning= FALSE, include=FALSE}
+census_api_key("e79f3706b6d61249968c6ce88794f6f556e5bf3d", overwrite = TRUE)
+```
+
+```{r load_key, warning = FALSE, eval = FALSE}
+census_api_key("YOUR KEY GOES HERE", overwrite = TRUE)
+```
+
+## Load census data dictionaries
+
+Now that we have our census credentials loaded, we can start downloading information from the API using some functions from tidycensus. We are going to grab some 2016 ACS estimates for Philadelphia census tracts. In order to choose variables of interest, we are going to load the 2016 ACS data dictionary using the tidycensus function `load_variables`. We turn it into a dataframe called `acs_variable_list.2016`.
+
+```{r load_variables, cache = TRUE}
+acs_variable_list.2016 <- load_variables(2016, #year
+                                         "acs5", #five year ACS estimates
+                                         cache = TRUE)
+```
+
+Once we have loaded these data, we can observe and search through the data frames of variable information which should appear in our global environment either by clicking on them or using the `View(acs_variable_list.2016)` command.
+
+Look around in th data frame for a few minutes and see what's in there.
+
+# Downloading Data from Tidycensus
+
+## Create a vector of census variables
+
+We can populate a vector of variable names we will send to the Census API. We call this list `acs_vars`. This is the beauty of a code-based workflow - you can take this vector and put anything you want in it when you have a new analysis to do and re-run it for different variables. These need to be character strings, and hence, in quotes as you see below.
+
+Keep in mind the categories and code numbers change a bit over time - you may need separate vectors for different census years.
+
+```{r acs_vars}
+acs_vars <- c("B01001_001E", # ACS total Pop estimate
+              "B25002_001E", # Estimate of total housing units
+              "B25002_003E", # Number of vacant housing units
+              "B19013_001E", # Median HH Income ($)
+              "B02001_002E", # People describing themselves as "white alone"
+              "B06009_006E") # Total graduate or professional degree
+```
+
+## Call the Census API to get tract level data for 2016 for all of Philadelphia
+
+We use the `get_acs` function in `tidycensus` to query the API. Notice the different arguments for the function, and that they require certain types of info. For example, `geography` requires one of a finite list of answers, and they have to be formatted as character string.
+
+Remember the `??` function - you can learn about the parameters for `get_acs` this way. There is also a function called `get_decennial` which you can use for decennial census counts.
+
+We ask for data on our `acs_vars` for all tracts in Philadelphia County, PA in 2016. We ask for "wide" data (e.g. one variable per column, one row per tract) and we set `geometry` to `FALSE`. (Later, we will set `geometry` to `true` and get some spatial data.)
+
+```{r get_acs_2016, cache = TRUE, message = FALSE, warning = FALSE}
+acsTractsPHL.2016 <- get_acs(geography = "tract",
+                             year = 2016, 
+                             variables = acs_vars, 
+                             geometry = FALSE, 
+                             state = "PA", 
+                             county = "Philadelphia", 
+                             output = "wide") 
+```
+
+Voila - now you have census data. Take a look and see what you have there - since it's the ACS, they are estimates - so you'll have data marked "E" for estimate, or "M" for margin of error.
+
+Let's use a `glimpse` command to check it out
+
+```{r glimpse_census}
+glimpse(acsTractsPHL.2016)
+```
+
+# 9. Vector GIS With sf
+
+TBD
+
+## Load in some spatial data
+
+## Understanding sf objects
+
+## Making Maps With ggplot
+
+## Vector Geoprocessing
+
+## Reading and writing spatial data
+
+You can write out any sf objects as .shp files which are readable in ArcGIS. This is especially useful if you want to just use R to grab data efficiently and want to map it elsewhere. I prefer to write geojsons - they are more widely usable and the column names are more stable.
+
+Use the fuction "st_write"
+
+`??st_write`
+
+You can also read in shapefiles with an `shp` file extension using `st_read`.
+
+# 10. Publishing Analyses with R Markdown
 
 TBD
 
@@ -354,19 +577,19 @@ If you want to see how markdown works - you can find a download button at the to
 
 TBD incl - Global Options, Chunk Options, kable tables
 
-# Querying APIs
+# 11. Querying APIs
 
 TBD incl - Socrata and REST API query functionalities for R.
 
-# Other Spatial Packages
+# 12. Other Spatial Packages
 
 Mapview, Leaflet, osmdata, raster
 
-# Project Workflows - Github and R Projects
+# 13. Project Workflows - Github and R Projects
 
 Github, R Projects, Writing Readable Code
 
-# Resources and texts
+# 14. Resources and texts
 
 ## Troubleshooting - How to ask a question
 
@@ -378,9 +601,11 @@ You can look up details about the functions you are using in R using the `??` co
 
 You can also check out the documentation about the packages, functions and the arguments they take in the Packages tab in the Viewer window in R Studio.
 
-If you are going to ask a question on the class forum, include some code, and details about your problem - like the data sources that you tried to use and how they look. This allows somebody to reproduce the issue on their own, or at least understand it. Here's an example:
+If you are going to ask a question on the class forum, include some code, and details about your problem - like the data sources that you tried to use and how they look. This allows somebody to reproduce the issue on their own, or at least understand it.
 
-EXAMPLE GOES HERE
+### Good Example Questions
+
+TBD
 
 ## R Cheat Sheets
 
