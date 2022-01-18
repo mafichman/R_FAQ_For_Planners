@@ -502,7 +502,7 @@ Once we have loaded these data, we can observe and search through the data frame
 
 Look around in th data frame for a few minutes and see what's in there.
 
-# Downloading Data from Tidycensus
+## Downloading Data from Tidycensus
 
 ## Create a vector of census variables
 
