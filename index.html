@@ -656,10 +656,22 @@ library(sf)</code></pre>
 ## $ B06009_006E &lt;dbl&gt; 80, 92, 29, 55, 1033, 166, 50, 265, 175, 74, 101, 65, 10, ~
 ## $ B06009_006M &lt;dbl&gt; 69, 53, 43, 48, 199, 74, 65, 130, 99, 49, 93, 38, 14, 14, ~</code></pre>
 </div>
+<div id="clean-census-data" class="section level2">
+<h2>Clean Census Data</h2>
+<p>The variable names that come with the stock Census data aren’t that helpful.</p>
+<p>You can use the <code>rename</code> function from <code>dplyr</code> to make the columns in your data intelligible.</p>
+<pre class="r"><code>acsTractsPHL.2016 &lt;- acsTractsPHL.2016 %&gt;%
+  rename (total_pop.2016 = B01001_001E,
+          total_HU.2016 = B25002_001E,
+          total_vacant.2016 = B25002_003E,
+          med_HH_Income.2016 = B19013_001E,
+          total_White.2016 = B02001_002E,
+          total_GradDeg.2016 = B06009_006E)</code></pre>
+</div>
 </div>
 <div id="vector-gis-with-sf" class="section level1">
 <h1>9. Vector GIS With sf</h1>
-<p>TBD</p>
+<p>Coming Soon!</p>
 <div id="load-in-some-spatial-data" class="section level2">
 <h2>Load in some spatial data</h2>
 </div>

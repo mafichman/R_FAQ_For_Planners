@@ -545,9 +545,25 @@ Let's use a `glimpse` command to check it out
 glimpse(acsTractsPHL.2016)
 ```
 
+## Clean Census Data
+
+The variable names that come with the stock Census data aren't that helpful.
+
+You can use the `rename` function from `dplyr` to make the columns in your data intelligible.
+
+```{r do_some_dplyr, cache = TRUE}
+acsTractsPHL.2016 <- acsTractsPHL.2016 %>%
+  rename (total_pop.2016 = B01001_001E,
+          total_HU.2016 = B25002_001E,
+          total_vacant.2016 = B25002_003E,
+          med_HH_Income.2016 = B19013_001E,
+          total_White.2016 = B02001_002E,
+          total_GradDeg.2016 = B06009_006E)
+```
+
 # 9. Vector GIS With sf
 
-TBD
+Coming Soon!
 
 ## Load in some spatial data
 
