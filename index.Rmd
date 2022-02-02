@@ -563,7 +563,15 @@ acsTractsPHL.2016 <- acsTractsPHL.2016 %>%
 
 # 9. Vector GIS With sf
 
-Coming Soon!
+We can use R as a GIS and easily manipulate vector data (points, lines and polygons). The main package we use for this is called `sf`. Here are some things that it does:
+
+- Reads shapefiles, geojsons and other spatial data files.
+
+- Allows you to manipulate spatial data using the same tools we use to manipulate data frames - `dplyr` tools like `mutate`, `rename` etc.,
+
+- Lets you do geoprocessing like you do in ArcGIS - spatial joins, area and distance calculations, union and dissolve functions, and more.
+
+- Makes maps by interfacing with `ggplot`
 
 ## Load in some spatial data
 
