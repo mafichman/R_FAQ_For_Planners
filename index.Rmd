@@ -184,7 +184,7 @@ install.packages('tidyverse')
 
 If you have already installed a package on your computer, you can load it into your environment using the `library` command.
 
-```{r load_pkg ,message = FALSE, warning = FALSE}
+```{r load_pkg , message = FALSE, warning = FALSE}
 library(tidyverse)
 ```
 
@@ -565,7 +565,7 @@ acsTractsPHL.2016 <- acsTractsPHL.2016 %>%
 
 We can use R as a GIS and easily manipulate vector data (points, lines and polygons). The main package we use for this is called `sf`. Here are some things that it does:
 
-- Reads shapefiles, geojsons and other spatial data files.
+- Reads .shps, geojson and other spatial data files.
 
 - Allows you to manipulate spatial data using the same tools we use to manipulate data frames - `dplyr` tools like `mutate`, `rename` etc.,
 
@@ -575,11 +575,73 @@ We can use R as a GIS and easily manipulate vector data (points, lines and polyg
 
 ## Load in some spatial data
 
-## Understanding sf objects
+Let's load in some spatial data in two ways.
+
+First, let's just load in some simple data using `st_read`, that's the `sf` package's basic read function. You can read stuff from the web or from a filepath on your computer this way.
+
+These are some data I grabbed from Open Street Map - Philadelphia area restaurants. You might recognize some of these. If you want to know more about grabbing OSM data, [check my repo with sample code.](https://github.com/mafichman/osm_data)
+
+These data are points (vector data can be points, lines or polygons).
+
+```{r load_geojson, message = FALSE, warning = FALSE, results = 'hide'}
+
+restaurants <- st_read("https://raw.githubusercontent.com/mafichman/R_FAQ_For_Planners/main/data/restaurants.geojson")
+
+```
+
+We can also get census data from `tidycensus` in spatial form.
+
+You might remember the code block below from Section 8 of this demo - where we grabbed a table of census data. We can grab the same data but in spatial form by changing the `geometry` argument to `TRUE`.
+
+These are polygon data - each row is a census tract, each column is a variable associated with each tract.
+
+```{r get_acs_2016.sf, message=FALSE, warning=FALSE, cache=TRUE, results = 'hide'}
+acsTractsPHL.2016.sf <- get_acs(geography = "tract",
+                             year = 2016, 
+                             variables = acs_vars, 
+                             geometry = TRUE, 
+                             state = "PA", 
+                             county = "Philadelphia", 
+                             output = "wide") %>%
+  rename (total_pop.2016 = B01001_001E,
+          total_HU.2016 = B25002_001E,
+          total_vacant.2016 = B25002_003E,
+          med_HH_Income.2016 = B19013_001E,
+          total_White.2016 = B02001_002E,
+          total_GradDeg.2016 = B06009_006E) 
+```
+
+## Understanding sf Objects - Geometry and Projections
+
+Let's examine an sf object, `restaurants`.
+
+```{r examine_sf}
+
+restaurants
+
+```
+
+This looks a lot like a data frame, and it is! You can easily manipulate sf objects just like data frames with `dplyr` like this:
+
+`sf_object <- sf_object %>% mutate(column_a = column_b + column_c)`
+
+But there are a couple major differences between sf objects and data frames.
+
+First, there is the `geometry` column - this is a set of drawing and geoprocessing instructions. You can't do a `mutate` or other kind of data manipulation on this column. `restaurants` is a point file, so the geometry is an ordered series of points.
+
+Second, there is a `crs` or "coordinate reference system" associated with the file. If you've used GIS you've heard of "projection" - that's where it's stored in the sf object.
+
+The crs here is 4326, which is also known as "Web Mercator" or"WGS 84" - this is the common latitude/longitude coordinate system you might be familiar with. You can change the crs when you are doing geoprocessing (more on that in a moment).
+
+The universe of coordinate systems can be found on a great website called [spatialreference.org](http://spatialreference.org).
 
 ## Making Maps With ggplot
 
+Under construction
+
 ## Vector Geoprocessing
+
+Spatial joins & Summaries, union, dissolve etc, calculate area
 
 ## Reading and writing spatial data
 
@@ -593,7 +655,7 @@ You can also read in shapefiles with an `shp` file extension using `st_read`.
 
 # 10. Publishing Analyses with R Markdown
 
-TBD
+Under construction....
 
 I will probably be asking you to turn in assignments using R Markdown. Markdown is a way to present your code-based projects as a more polished document (you're reading a markdown right now!). For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
@@ -664,6 +726,10 @@ Handy tips for making your code readable
 - [R Style Guide](https://google.github.io/styleguide/Rguide.html)
 
 - [Tidyverse Style Guide](https://style.tidyverse.org/)
+
+## Open Source GIS Resources
+
+- [spatialreference.org](http://spatialreference.org)
 
 ## Books
 
