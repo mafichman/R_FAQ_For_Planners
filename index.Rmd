@@ -694,9 +694,9 @@ Before we get started, we have to make sure our data are projected in the same c
 st_crs(restaurants) == st_crs(acsTractsPHL.2016.sf)
 ```
 
-The function `st_join` does the work for us here to join points to the polygons that contain them, and it has lots of options. Here, we say the type of join is `intersects` as in "does this point from the left hand data set intersect the polygon from the right hand data set?" We also say `left=TRUE` - indicating we want a "left join" - preserving all items from the left hand data set, whether or not they join to the items on the right.
+The function `st_join` does the work for us here to join points to the polygons that contain them, and it has lots of options. Here, we say the type of join is `intersects` as in "does this point from the left hand data set intersect the polygon from the right hand data set?" We also say `left=TRUE` - indicating we want a "left join" - preserving all items from the left hand data set, whether or not they join to the items on the right. The things that don't join (eg. outside of Philly), they don't show up.
 
-Notice, that I pipe the `st_transform` command to `restaurants` right inside the join statement and reproject it so this operation works!
+Notice, that I pipe the `st_transform` command to `restaurants` right inside the join statement and re-project it so this operation works!
 
 ```{r spatial_join, warning = FALSE, message = FALSE}
 
@@ -707,14 +707,44 @@ restaurants.and.tracts <- st_join(restaurants %>%
 
 ```
 
+This operation produces a data set where the rows are restaurants, and there is a column denoting the tract it falls in.
+
+Now we can convert to a data frame (`as.data.frame`) summarize the number of observations by census tract (`group_by`, `summarize`), join these to our tract `sf` file by `GEOID` (`left_join`).
+
+```{r summarize_join_map}
+
+restaurant_summary <- 
+  restaurants.and.tracts %>%
+  as.data.frame() %>%
+  group_by(GEOID) %>%
+  summarize(restaurant_sum = n())
+
+tracts_and_restaurants <-
+  left_join(acsTractsPHL.2016.sf, restaurant_summary,
+            by = c("GEOID"))
+
+ggplot()+
+  geom_sf(data = tracts_and_restaurants, 
+          aes(fill = restaurant_sum),
+          color = "transparent")
+
+```
 
 ### Spatial Operations
 
-Under construction
+The `sf` package can do most of what you do with vectors in ArcGIS, including... 
 
-### Area and Distance
+- Geometric functions like `st_union`, `st_buffer`, `st_dissolve` and so on. 
 
-Under construction
+- You can find a polygon centroid with `st_centroid`.
+
+- Measurement functions: Calculate a polygon's area or perimeter (in the native units of its projection) with `st_area`. Find the distance between two `sf` objects with `st_distance`.
+
+There are some spatial functions that you need to find other packages for, like K-nearest-neighbors functions.
+
+Check out the `sf` "cheat sheet" to see what it can do:
+
+[R Studio: sf cheatsheet](https://raw.githubusercontent.com/rstudio/cheatsheets/main/sf.pdf)
 
 ## Writing spatial data
 
