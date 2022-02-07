@@ -458,7 +458,7 @@ ggplot()+
   plotTheme
 ```
 
-# 8. The US Census Data with tidycensus
+# 8. Census Data with tidycensus
 
 You can access the US Census using the `tidycensus` package - this is much faster than grabbing Census data on the web. You can grab the variables you want with or without spatial data attached. 
 
@@ -625,6 +625,9 @@ acsTractsPHL.2016.sf <- get_acs(geography = "tract",
 
 Let's examine an sf object, `restaurants`. Call the object in your console and look at some of the characteristics.
 
+It is worth noting here that the 10th row in the data set, "Mi Puebla", is a  fantastic Mexican spot in Mt Airy. It makes me hungry just seeing that data point.
+
+
 ```{r examine_sf}
 
 restaurants
@@ -681,11 +684,9 @@ Spatial joins & Summaries, union, dissolve etc, calculate area
 
 You can write out any sf objects as .shp files which are readable in ArcGIS. This is especially useful if you want to just use R to grab data efficiently and want to map it elsewhere. I prefer to write geojsons - they are more widely usable and the column names are more stable.
 
-Use the fuction "st_write"
+Use the function "st_write" like so:
 
-`??st_write`
-
-You can also read in shapefiles with an `shp` file extension using `st_read`.
+`st_write(my_sf_object, "my_filepath/my_filename.shp")`
 
 # 10. Publishing Analyses with R Markdown
 
