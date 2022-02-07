@@ -646,6 +646,8 @@ Second, there is a `crs` or "coordinate reference system" associated with the fi
 
 The crs here is 4326, which is also known as "Web Mercator" or"WGS 84" - this is the common latitude/longitude coordinate system you might be familiar with. You can change the crs when you are doing geoprocessing (more on that in a moment).
 
+The `st_transform` command is your friend, that's how you do reprojections - look it up - `??st_transform`
+
 The universe of coordinate systems can be found on a great website called [spatialreference.org](http://spatialreference.org).
 
 ## Making Maps With ggplot
@@ -678,7 +680,41 @@ ggplot()+
  
 ## Vector Geoprocessing
 
-Spatial joins & Summaries, union, dissolve etc, calculate area
+The `sf` package has lots of commands that do basic geoprocessing. I can do spatial joins, I can calculate distances and areas, I can do spatial processes like buffer, union, and dissolve.
+
+Mind your projections when you do these things. If you try to calculate distance if your crs is in decimal degrees, you'll get outputs in decimal degrees (probably not helpful).
+
+### Spatial Join
+
+You can join spatial objects to one another in `sf` just like in any other GIS. Let's join `restaurants` to `acsTracts.PHL.2016.sf`. After we do that join, we can summarize how many restaurants are in each tract.
+
+Before we get started, we have to make sure our data are projected in the same coordinate system. Let's use the `st_crs` command to check on that. Turns out `restaurants` is in WGS 84 (crs = 4326), and `acsTractsPHL.2016.sf` is in NAD 83 (crs = 4249)
+
+```{r}
+st_crs(restaurants) == st_crs(acsTractsPHL.2016.sf)
+```
+
+The function `st_join` does the work for us here to join points to the polygons that contain them, and it has lots of options. Here, we say the type of join is `intersects` as in "does this point from the left hand data set intersect the polygon from the right hand data set?" We also say `left=TRUE` - indicating we want a "left join" - preserving all items from the left hand data set, whether or not they join to the items on the right.
+
+Notice, that I pipe the `st_transform` command to `restaurants` right inside the join statement and reproject it so this operation works!
+
+```{r spatial_join, warning = FALSE, message = FALSE}
+
+restaurants.and.tracts <- st_join(restaurants %>%
+                                    st_transform(crs = st_crs(acsTractsPHL.2016.sf)), acsTractsPHL.2016.sf,
+                                  join = st_intersects,
+                                  left = TRUE)
+
+```
+
+
+### Spatial Operations
+
+Under construction
+
+### Area and Distance
+
+Under construction
 
 ## Writing spatial data
 

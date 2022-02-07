@@ -746,6 +746,7 @@ library(sf)</code></pre>
 <p>First, there is the <code>geometry</code> column - this is a set of drawing and geoprocessing instructions. You can’t do a <code>mutate</code> or other kind of data manipulation on this column. <code>restaurants</code> is a point file, so the geometry is an ordered series of points.</p>
 <p>Second, there is a <code>crs</code> or “coordinate reference system” associated with the file. If you’ve used GIS you’ve heard of “projection” - that’s where it’s stored in the sf object.</p>
 <p>The crs here is 4326, which is also known as “Web Mercator” or”WGS 84” - this is the common latitude/longitude coordinate system you might be familiar with. You can change the crs when you are doing geoprocessing (more on that in a moment).</p>
+<p>The <code>st_transform</code> command is your friend, that’s how you do reprojections - look it up - <code>??st_transform</code></p>
 <p>The universe of coordinate systems can be found on a great website called <a href="http://spatialreference.org">spatialreference.org</a>.</p>
 </div>
 <div id="making-maps-with-ggplot" class="section level2">
@@ -770,7 +771,29 @@ library(sf)</code></pre>
 </div>
 <div id="vector-geoprocessing" class="section level2">
 <h2>Vector Geoprocessing</h2>
-<p>Spatial joins &amp; Summaries, union, dissolve etc, calculate area</p>
+<p>The <code>sf</code> package has lots of commands that do basic geoprocessing. I can do spatial joins, I can calculate distances and areas, I can do spatial processes like buffer, union, and dissolve.</p>
+<p>Mind your projections when you do these things. If you try to calculate distance if your crs is in decimal degrees, you’ll get outputs in decimal degrees (probably not helpful).</p>
+<div id="spatial-join" class="section level3">
+<h3>Spatial Join</h3>
+<p>You can join spatial objects to one another in <code>sf</code> just like in any other GIS. Let’s join <code>restaurants</code> to <code>acsTracts.PHL.2016.sf</code>. After we do that join, we can summarize how many restaurants are in each tract.</p>
+<p>Before we get started, we have to make sure our data are projected in the same coordinate system. Let’s use the <code>st_crs</code> command to check on that. Turns out <code>restaurants</code> is in WGS 84 (crs = 4326), and <code>acsTractsPHL.2016.sf</code> is in NAD 83 (crs = 4249)</p>
+<pre class="r"><code>st_crs(restaurants) == st_crs(acsTractsPHL.2016.sf)</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<p>The function <code>st_join</code> does the work for us here to join points to the polygons that contain them, and it has lots of options. Here, we say the type of join is <code>intersects</code> as in “does this point from the left hand data set intersect the polygon from the right hand data set?” We also say <code>left=TRUE</code> - indicating we want a “left join” - preserving all items from the left hand data set, whether or not they join to the items on the right.</p>
+<p>Notice, that I pipe the <code>st_transform</code> command to <code>restaurants</code> right inside the join statement and reproject it so this operation works!</p>
+<pre class="r"><code>restaurants.and.tracts &lt;- st_join(restaurants %&gt;%
+                                    st_transform(crs = st_crs(acsTractsPHL.2016.sf)), acsTractsPHL.2016.sf,
+                                  join = st_intersects,
+                                  left = TRUE)</code></pre>
+</div>
+<div id="spatial-operations" class="section level3">
+<h3>Spatial Operations</h3>
+<p>Under construction</p>
+</div>
+<div id="area-and-distance" class="section level3">
+<h3>Area and Distance</h3>
+<p>Under construction</p>
+</div>
 </div>
 <div id="writing-spatial-data" class="section level2">
 <h2>Writing spatial data</h2>
