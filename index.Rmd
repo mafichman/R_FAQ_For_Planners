@@ -1,7 +1,7 @@
 ---
 title: "Intro to R and FAQ for Planners"
 author: "Michael Fichman"
-date: "1/4/2022"
+date: "2/7/2022"
 output: 
   html_document:
     toc: true
