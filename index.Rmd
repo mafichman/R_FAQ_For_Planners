@@ -344,7 +344,17 @@ myData %>%
 
 ## Joining Data
 
-Under construction
+You can do "tabular joins" between data sets when they have a "unique ID" - a number or code that identifies each observation or subject in your data. For example, the "GEOID" is the unique code associated with each census tract.
+
+There are several types of joins you can use in R. Hadley Wickham's "R For Data Science" [has a great chapter and series of code examples](https://r4ds.had.co.nz/relational-data.html) on the mechanics of left, right, inner, outer, full, and other joins.
+
+The basic mechanics of a join go like this:
+
+`new_dataframe <- left_join(dataframe1, dataframe2, by = c("unique_ID"))`
+
+This will get you a data set where you preserve all of `dataframe1` (the "left" side of the left join), and tack on anything from `dataframe2` that matches `unique_ID` found in `dataframe1`
+
+Notice the `by` call where you specify the unique ID, that's a weird bit of syntax. You can join on multiple Unique IDs if you want.
 
 # 7. Making Plots with ggplot2
 
@@ -448,7 +458,7 @@ ggplot()+
   plotTheme
 ```
 
-# 8. Tidycensus
+# 8. The US Census Data with tidycensus
 
 You can access the US Census using the `tidycensus` package - this is much faster than grabbing Census data on the web. You can grab the variables you want with or without spatial data attached. 
 
@@ -613,7 +623,7 @@ acsTractsPHL.2016.sf <- get_acs(geography = "tract",
 
 ## Understanding sf Objects - Geometry and Projections
 
-Let's examine an sf object, `restaurants`.
+Let's examine an sf object, `restaurants`. Call the object in your console and look at some of the characteristics.
 
 ```{r examine_sf}
 
@@ -637,13 +647,37 @@ The universe of coordinate systems can be found on a great website called [spati
 
 ## Making Maps With ggplot
 
-Under construction
+`ggplot` supports a geometry called `geom_sf` that allows you to plot sf objects. As with making graphs and plots, you have lots of styling options with ggplot.
 
+Here is a simple one, using the census data we grabbed:
+
+```{r ggplot_sf1}
+ggplot()+
+  geom_sf(data = acsTractsPHL.2016.sf)
+
+```
+
+You can can make very complex maps in ggplot. You can add many geom_sf drawing layers, and you can use ggplot's `aes` features to make cool aesthetics for your maps. Here's something a bit more complicated: 
+
+- I use a `fill` parameter in my `aes` call to symbologize `total_GradDeg.2016` in the census data.
+
+- I set the linework to be transparent (this is outside the `aes` call because it doesn't pertain to any data, just looks.
+
+- I add my Philly area restaurants on top, and give them a color and a size parameter.
+
+```{r ggplot_sf2}
+ggplot()+
+  geom_sf(data = acsTractsPHL.2016.sf, 
+          aes(fill = total_GradDeg.2016),
+          color = "transparent")+
+  geom_sf(data = restaurants, color = "yellow", size = 0.5)
+```
+ 
 ## Vector Geoprocessing
 
 Spatial joins & Summaries, union, dissolve etc, calculate area
 
-## Reading and writing spatial data
+## Writing spatial data
 
 You can write out any sf objects as .shp files which are readable in ArcGIS. This is especially useful if you want to just use R to grab data efficiently and want to map it elsewhere. I prefer to write geojsons - they are more widely usable and the column names are more stable.
 
