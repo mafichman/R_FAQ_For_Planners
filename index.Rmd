@@ -6,7 +6,7 @@ output:
   html_document:
     toc: true
     toc_float: true
-    code_download: false
+    code_download: true
 ---
 
 ```{r setup, include=FALSE}
@@ -491,7 +491,8 @@ You will need a "key" to access the Census API. You can find one at [their websi
 Paste it into the code block below and run it to load your key in to your R environment:
 
 ```{r load_key_hide, warning= FALSE, include=FALSE}
-census_api_key("e79f3706b6d61249968c6ce88794f6f556e5bf3d", overwrite = TRUE)
+census_key <- read.table("~/GitHub/census_key.txt", quote="\"", comment.char="")
+census_api_key(census_key[1] %>% as.character(), overwrite = TRUE)
 ```
 
 ```{r load_key, warning = FALSE, eval = FALSE}
@@ -730,7 +731,7 @@ ggplot()+
 
 ```
 
-### Spatial Operations
+### Other Spatial Operations
 
 The `sf` package can do most of what you do with vectors in ArcGIS, including... 
 
@@ -756,25 +757,25 @@ Use the function "st_write" like so:
 
 # 10. Publishing Analyses with R Markdown
 
-Under construction....
-
 I will probably be asking you to turn in assignments using R Markdown. Markdown is a way to present your code-based projects as a more polished document (you're reading a markdown right now!). For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
 If you want to see how markdown works - you can find a download button at the top right of this document and download the code that was used to make this.
 
-TBD incl - Global Options, Chunk Options, kable tables
+# 11. Project Workflows - Github and R Projects
 
-# 11. Querying APIs
+Github, R Projects, Writing Readable Code
+
+# 12. Querying APIs
+
+Coming soon:
 
 TBD incl - Socrata and REST API query functionalities for R.
 
-# 12. Other Spatial Packages
+# 13. Other Spatial Packages
+
+Coming soon:
 
 Mapview, Leaflet, osmdata, raster
-
-# 13. Project Workflows - Github and R Projects
-
-Github, R Projects, Writing Readable Code
 
 # 14. Resources and texts
 
