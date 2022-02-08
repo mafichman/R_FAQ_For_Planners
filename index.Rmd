@@ -19,9 +19,9 @@ This is a working document designed to give a basic introduction to R for those 
 
 This isn't a "coding" tutorial, it's a starter kit that demonstrates how R can do some familiar Excel or ArcGIS-like tasks - loading spreadsheets and spatial data, creating new columns of data, summarizing and querying data, making charts and maps - and do them faster, better, and more reproducibly.
 
-Use the table of contents at left to navigate through the document - the simplest topics are first (e.g. "What is R?", "How do I download R?"), the latter sections are more advanced (Geoprocessing, Census Data etc). There are references to books and reference materials at the end of the doc.
+Use the table of contents at left to navigate through the document - the simplest topics are first (e.g. "What is R?", "How do I download R?"), the latter sections are more advanced (Geoprocessing, Census Data, Markdown documents). There are references to books and reference materials at the end of the doc.
 
-This document will be updated on an ongoing basis (it's a construction site). Right now, sections 1-8 are complete - which is what students in CPLN 675 will need to get up and running this spring!
+This document will be updated on an ongoing basis (it's a construction site). Right now, sections 1-10 are complete - which is what students in MUSA 508 and CPLN 675 will need to get up and running this spring!
 
 **Michael Fichman**
 
@@ -33,7 +33,7 @@ This document will be updated on an ongoing basis (it's a construction site). Ri
 
 *Researcher, PennPraxis*
 
-*Data Scientist - Center for Safe Mobility*
+*Data Scientist, Center for Safe Mobility*
 
 # 2. Getting Started with R
 
@@ -530,9 +530,9 @@ acs_vars <- c("B01001_001E", # ACS total Pop estimate
               "B06009_006E") # Total graduate or professional degree
 ```
 
-## Call the Census API to get tract level data for 2016 for all of Philadelphia
+## Call the Census API
 
-We use the `get_acs` function in `tidycensus` to query the API. Notice the different arguments for the function, and that they require certain types of info. For example, `geography` requires one of a finite list of answers, and they have to be formatted as character string.
+We use the `get_acs` function in `tidycensus` to query the API and get tract level-data for all of Philadelphia from the 2016 American Community Survey's (ACS) 5-year estimates. Notice the different arguments for the function, and that they require certain types of info. For example, `geography` requires one of a finite list of answers, and they have to be formatted as character string.
 
 Remember the `??` function - you can learn about the parameters for `get_acs` this way. There is also a function called `get_decennial` which you can use for decennial census counts.
 
