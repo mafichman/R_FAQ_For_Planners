@@ -763,13 +763,35 @@ If you want to see how markdown works - you can find a download button at the to
 
 # 11. Project Workflows - Github and R Projects
 
-Github, R Projects, Writing Readable Code
+As you work on increasingly sophisticated or collaborative projects using R, you will want to figure out a way to manage your files and code, and to figure out ways to keep your code working as you improve and develop it.
+
+Best practices in coding is a subject for a whole entire course, but here are a few simple tips to get you started.
+
+## 11.1 R Projects
+
+R has a "projects" file-type which can help you keep an organized file structure and working environment in R Studio. There is a file type called `.rProj` that coordinates this. You can open a new project by going to File -> New Project in R Studio. Check out the "Files" part of your R Studio window and see how you can now graphically view your files. Best of all, if you keep things contained in a project, it's more portable from computer to computer because you're just calling files inside one Project.
+
+[Read Hadley Wickham's tutorial](https://r4ds.had.co.nz/workflow-projects.html) on how working with R Projects can help you with organization.
+
+## 11.2 Github
+
+Github is a code-collaboration environment that allows you to use "source control" and work on things with others without accidentally over-writing or breaking other peoples' code. Github works well with R Projects. You can "push" and "pull" code and data straight from R Studio or use a program called Github Desktop (which I prefer). You will need an account on Github to make this all work.
+
+The mechanics of collaborating with Github are too complex for this space, but [check out Matt Harris' tutorial from MUSA 508 on using Github](https://github.com/mafichman/R_FAQ_For_Planners/blob/main/pdf/Week_1_Lab_Intro_to_Github(1).pdf) for detailed instructions on how to get set up and start collaborating.
+
+## 11.3 Writing Readable Code
+
+Coming soon!
+
+## 11.4 Data management
+
+Coming soon!
 
 # 12. Querying APIs
 
 Coming soon:
 
-TBD incl - Socrata and REST API query functionalities for R.
+TBD incl - Socrata and REST API query functionalities for R, boxr and PennBox
 
 # 13. Other Spatial Packages
 
