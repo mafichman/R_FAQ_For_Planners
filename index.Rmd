@@ -827,6 +827,24 @@ If you are going to ask a question on the class forum, include some code, and de
 
 - Did you google the question before you came and asked for help? (The answer should be yes).
 
+Here are some examples of some bad questions, and some alternatives:
+
+Class forum issue: 
+"I tried to make this code work (pastes code block) and I got an error." 
+
+-> 
+
+"I ran this code block using data that look like this (show the results of a `head` or `glimpse` command) and got this error (copy and paste error message). I have the following packages installed...."
+
+
+Google query:
+
+"How do you get my file to join the other?"
+
+->
+
+"Spatial joins in r with sf"
+
 ## R Cheat Sheets
 
 R Studio's website has some really good [cheat sheets](https://www.rstudio.com/resources/cheatsheets/) with simple walkthroughs of basic functions in some core packages
