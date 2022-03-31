@@ -1,7 +1,7 @@
 ---
 title: "Intro to R and FAQ for Planners"
 author: "Michael Fichman"
-date: "2/7/2022"
+date: "3/31/2022"
 output: 
   html_document:
     toc: true
@@ -777,7 +777,28 @@ R has a "projects" file-type which can help you keep an organized file structure
 
 Github is a code-collaboration environment that allows you to use "source control" and work on things with others without accidentally over-writing or breaking other peoples' code. Github works well with R Projects. You can "push" and "pull" code and data straight from R Studio or use a program called Github Desktop (which I prefer). You will need an account on Github to make this all work.
 
-The mechanics of collaborating with Github are too complex for this space, but [check out Matt Harris' tutorial from MUSA 508 on using Github](https://github.com/mafichman/R_FAQ_For_Planners/blob/main/pdf/Week_1_Lab_Intro_to_Github(1).pdf) for detailed instructions on how to get set up and start collaborating.
+Here is a quick step-by-step guide to setting up a collaborative repo, an R project, and sending some code back and forth, using Github Desktop and R Studio:
+
+- Create a new repo on your github page
+
+- Add your github collaborator by going to settings/collaborators
+
+- Go to your Github Desktop app, and "clone" the repo - this will populate a version on your computer in it's own folder.
+
+- Go into R Studio, and start a new "project" - put it in the repo folder. Do some work - create a new R script, add some data.
+
+- When you are done - go to Github Desktop, write some annotations about the changes you made to the code, and "push" the changes to the web repo.
+
+- Your collaborator can clone the project, and then push and pull things themselves. This will help you manage changes and versions. If you keep all your code and data inside the Github folder, the file paths will all be the same and it will be easy to collaborate.
+
+
+The finer mechanics of collaborating with Github are too complex for this document, but [check out Matt Harris' tutorial from MUSA 508 on using Github](https://github.com/mafichman/R_FAQ_For_Planners/blob/main/pdf/Week_1_Lab_Intro_to_Github(1).pdf) for detailed instructions on how to get set up and start collaborating.
+
+### 11.2.1. Github Pages
+
+It's a bit weird to send HTML markdowns to clients and n00bs and say "you need to DL this and open it in your browser to see it", but you can easily publish a knit html markdown to the web using github. If you name the markdown (in HTML form) `index`, you can go to your repo settings, and activate the "pages" functionality. This will publish the html file as a github.io webpage.
+
+This page itself is an example - (check out the repo behind it)[https://github.com/mafichman/R_FAQ_For_Planners] to see how this all works!
 
 ## 11.3 Writing Readable Code
 
@@ -888,6 +909,10 @@ If you're in a class with me - these books are likely to be among the required o
 - [Analyzing US Census Data - Kyle Walker](https://walker-data.com/census-r/)
 
 - [Geospatial Health Data - Paula Moraga](https://www.paulamoraga.com/book-geospatial/)
+
+## Articles and Other Resources
+
+- [A detailed guide to colors in data vis style guides - Lisa Charlotte Muth](https://blog.datawrapper.de/colors-for-data-vis-style-guides/)
 
 # FAQ
 
