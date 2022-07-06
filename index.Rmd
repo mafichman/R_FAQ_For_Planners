@@ -802,7 +802,40 @@ This page itself is an example - (check out the repo behind it)[https://github.c
 
 ## 11.3 Writing Readable Code
 
-Coming soon!
+You will probably find yourself writing code that other people have to use - or that you will save and use at some time in the future. It's important to make sure you format and annotate your code so that your colleagues or your future self can use it, understand it, and troubleshoot it.
+
+Here are some simple tips to keep your code nice and neat:
+
+- Name your files and variables things that are intelligible. Name a dataframe `census_2011` instead of nonsense like `new_dataframe`. Don't call your functions or your data objects names that might be used elsewhere in your R environment - for example, don't try to name a dataframe `false` or `median`.
+
+- Use spaces in your code before and after operators like parenthesis or equals signs, like this: `theMedian <- median(c(1, 4, 6))`
+
+- Use a return at the end of each pipe when you are using tidyverse and dplyr, and use a return after each `+` when you are using ggplot2.
+
+- Use indentations and multiple lines to split apart long functions - try to use one idea per line. R Studio does a good job of managing indentations for you automatically. 
+
+Here's a quick example of a few of these things in action by piping together a few operations. We `mutate` a new variable called `high_income` in `acsTractsPHL.2016.sf` and send that categorical to the `fill` command in a `geom_sf` in `ggplot2` using the `sf` package. In the "bad" example we just write a big giant sentence. In the "better" example we use returns after our pipes and plus signs, and we break up our `ifelse` statement using returns to make it easier to read.
+
+```{r eval=FALSE}
+# Bad
+
+acsTractsPHL.2016.sf %>% mutate(high_income = ifelse(med_HH_Income.2016 > 100000, "Over 100k", "Under 100k")) %>% ggplot()+ geom_sf(aes(fill = high_income)) 
+```
+
+
+```{r}
+# Better
+
+acsTractsPHL.2016.sf %>% 
+  mutate(high_income = ifelse(med_HH_Income.2016 > 100000, 
+                              "Over 100k", 
+                              "Under 100k")) %>% 
+  ggplot()+ 
+  geom_sf(aes(fill = high_income)) 
+```
+
+
+Check out [https://style.tidyverse.org/index.html](the tidyverse Style Guide) for more info on how to write legible code.
 
 ## 11.4 Data management
 
@@ -818,7 +851,7 @@ TBD incl - Socrata and REST API query functionalities for R, boxr and PennBox
 
 Coming soon:
 
-Mapview, Leaflet, osmdata, raster
+Mapview, Leaflet, osmdata, raster, crs_suggest
 
 # 14. Resources and texts
 
