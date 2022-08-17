@@ -1,7 +1,7 @@
 ---
 title: "Intro to R and FAQ for Planners"
 author: "Michael Fichman"
-date: "3/31/2022"
+date: "8/17/2022"
 output: 
   html_document:
     toc: true
@@ -21,7 +21,7 @@ This isn't a "coding" tutorial, it's a starter kit that demonstrates how R can d
 
 Use the table of contents at left to navigate through the document - the simplest topics are first (e.g. "What is R?", "How do I download R?"), the latter sections are more advanced (Geoprocessing, Census Data, Markdown documents). There are references to books and reference materials at the end of the doc.
 
-This document will be updated on an ongoing basis (it's a construction site). Right now, sections 1-10 are complete - which is what students in CPLN 675 will need to get up and running this spring!
+This document will be updated on an ongoing basis (it's a construction site). Right now, sections 1-10 are complete - which is what students in CPLN 675 and MUSA 508 will need to get up and running this year!
 
 **Michael Fichman**
 
@@ -789,7 +789,7 @@ Here is a quick step-by-step guide to setting up a collaborative repo, an R proj
 
 - When you are done - go to Github Desktop, write some annotations about the changes you made to the code, and "push" the changes to the web repo.
 
-- Your collaborator can clone the project, and then push and pull things themselves. This will help you manage changes and versions. If you keep all your code and data inside the Github folder, the file paths will all be the same and it will be easy to collaborate.
+- Your collaborator can clone the project, and then push and pull things themselves. This will help you manage changes and versions. If you keep all your code and data inside the Github folder, the file paths will all be the same and it will be easy to collaborate. You can work separately without breaking each other's code - use "branches" to make changes on your own version of the code, and then push it to the main code base later.
 
 
 The finer mechanics of collaborating with Github are too complex for this document, but [check out Matt Harris' tutorial from MUSA 508 on using Github](https://github.com/mafichman/R_FAQ_For_Planners/blob/main/pdf/Week_1_Lab_Intro_to_Github(1).pdf) for detailed instructions on how to get set up and start collaborating.
