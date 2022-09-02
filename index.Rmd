@@ -374,7 +374,7 @@ We `gather` those variables, and make a data frame where each row is a tract, it
 
 Then we can `group_by` the population change direction (TRUE - positive) and the `variable`, and summarize the `median_value` for each variable.
 
-```{r gather_example}
+```{r gather_example, warning = FALSE, message = FALSE}
 myData %>% 
   select(pop_change_positive, med_HH_Income.2010,  total_White.2010, total_HU.2010) %>% 
   gather(-pop_change_positive, key = "variable", value = "value") %>% 
@@ -398,7 +398,7 @@ wide and long data are a weird concept - this graphic is pretty helpful understa
 
 *Can you think of a few situations in which one form or another is appropriate?*
 
-![Pivoting between wide and long data](https://raw.githubusercontent.com/mafichman/R_FAQ_ForPlanners/images/tidyr-spread-gather.gif)
+![Pivoting between wide and long data](https://raw.githubusercontent.com/mafichman/R_FAQ_For_Planners/77a55a51d7209e4b6f6b39a731ced0a653a0e178/images/tidyr-spread-gather.gif)
 Image: https://www.garrickadenbuie.com/
 
 The wide/long data concept is a bit nebulous, but it really comes in handy when you are making facetted graphics - a subject covered in the next section.
@@ -461,6 +461,8 @@ ggplot()+
 ```
 
 Remember how we used `gather` and `pivot_longer` to make our wide data into long data in the last section? That's an incredibly useful technique for making quick data-mining visualizations across a number of variables.
+
+Notice how below, I do the same data manipulation I did in the previous section, and then I just pipe in the ggplot call, and I use an argument in the `facet_wrap` called `scales` so that each chart has a y-axis with an appropriate scale to that variable.
 
 ```{r ggplot_long, warning = FALSE, message = FALSE}
 myData %>% 
