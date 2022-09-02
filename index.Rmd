@@ -356,6 +356,53 @@ This will get you a data set where you preserve all of `dataframe1` (the "left" 
 
 Notice the `by` call where you specify the unique ID, that's a weird bit of syntax. You can join on multiple Unique IDs if you want.
 
+## Wide Data and Long Data
+
+One concept that is important but a bit hard to engage is data format. The dataframe `myData` that we have been working with so far is what's called a "wide" data set. Each row is a census tract, each column is a variable. This is great for doing column math with `mutate` and it's good for making certain kinds of plots - for instance a scatter plot with two continuous variables (more on this in the next section).
+
+Take a look at `myData` using the command `View(myData)` and you'll see that it is indeed "wide" format.
+
+There is another form of data called "long" data that are useful for other circumstances, like making comparisons between continuous variables across categories. (Note: Often you find time-series data in long format).
+
+Let's examine indicators from 2010 of tracts that appreciated in population between 2010 and 2016:
+
+- Median household income
+- Median number of people identifying their racial background as "white alone"
+- Median number of housing units
+
+We `gather` those variables, and make a data frame where each row is a tract, it's `pop_change_positve` value (TRUE/FALSE), a variable name, and a value for that variable.
+
+Then we can `group_by` the population change direction (TRUE - positive) and the `variable`, and summarize the `median_value` for each variable.
+
+```{r gather_example}
+myData %>% 
+  select(pop_change_positive, med_HH_Income.2010,  total_White.2010, total_HU.2010) %>% 
+  gather(-pop_change_positive, key = "variable", value = "value") %>% 
+  group_by(pop_change_positive, variable) %>%
+  summarize(median_value = median(value, na.rm = TRUE))
+
+```
+
+*Note* there is a more modern version of `gather` known as `pivot_longer`, where the syntax would look like this:
+
+```{r pivot_longer, eval=FALSE}
+myData %>% 
+  select(pop_change_positive, med_HH_Income.2010,  total_White.2010, total_HU.2010) %>% 
+  pivot_longer(cols = -pop_change_positive) %>%
+  group_by(pop_change_positive, name) %>%
+  summarize(median_value = median(value, na.rm = TRUE)) 
+    
+```
+
+wide and long data are a weird concept - this graphic is pretty helpful understanding how data can transform from one form to another.
+
+*Can you think of a few situations in which one form or another is appropriate?*
+
+![Pivoting between wide and long data](https://raw.githubusercontent.com/mafichman/R_FAQ_ForPlanners/images/tidyr-spread-gather.gif)
+Image: https://www.garrickadenbuie.com/
+
+The wide/long data concept is a bit nebulous, but it really comes in handy when you are making facetted graphics - a subject covered in the next section.
+
 # 7. Making Plots with ggplot2
 
 `ggplot2` is the main graphics library in the `tidyverse` - it's fantastic. You can make bar plots, line plots, and much more with it.
@@ -411,6 +458,19 @@ ggplot()+
   geom_point(data = myData, 
              aes(x = vacancyPct.2016, y = med_HH_Income.2016))+
   facet_wrap(~pop_change_positive)
+```
+
+Remember how we used `gather` and `pivot_longer` to make our wide data into long data in the last section? That's an incredibly useful technique for making quick data-mining visualizations across a number of variables.
+
+```{r ggplot_long, warning = FALSE, message = FALSE}
+myData %>% 
+  select(pop_change_positive, med_HH_Income.2010,  total_White.2010, total_HU.2010) %>% 
+  pivot_longer(cols = -pop_change_positive) %>%
+  group_by(pop_change_positive, name) %>%
+  summarize(median_value = median(value, na.rm = TRUE)) %>%
+ggplot()+
+  geom_bar(aes(x = pop_change_positive, y = median_value), stat = "identity")+
+  facet_wrap(~name, scales = "free")
 ```
 
 ## Advanced graphics
