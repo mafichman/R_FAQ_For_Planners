@@ -819,9 +819,15 @@ Use the function "st_write" like so:
 
 # 10. Publishing Analyses with R Markdown
 
-I will probably be asking you to turn in assignments using R Markdown. Markdown is a way to present your code-based projects as a more polished document (you're reading a markdown right now!). For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+I will probably be asking you to turn in assignments using R Markdown. Markdown is a way to present your code-based projects as a more polished document (you're reading a markdown right now!). 
 
-If you want to see how markdown works - you can find a download button at the top right of this document and download the code that was used to make this.
+A markdown document embeds "chunks" of R code in between bits of text. These chunks can simply be bits of code, or they can be code that creates some kind of image like a `ggplot` chart or a `kable` table. You can manipulate the options of a code chunk so that the output appears a certain way.
+
+You can use this tool to make repeatable reporting workflows for non-techincal audience using R. [I often write data reports like this one for my clients](https://voicesofcreativedata.nighttime.org/), where I "hide" all the code and just show the outputs.
+
+If you want to read more about how markdown works - you can find a download button at the top right of this document and download the code that was used to make this.
+
+For more details on using R Markdown, consult <http://rmarkdown.rstudio.com> or check out [this great book from Xie et al](https://bookdown.org/yihui/rmarkdown-cookbook/).
 
 # 11. Project Workflows - Github and R Projects
 
@@ -985,6 +991,10 @@ Handy tips for making your code readable
 
 - [Tidyverse Style Guide](https://style.tidyverse.org/)
 
+Color Palette ideas
+
+- [Color Brewer 2 - Color Palettes and Ramps](https://colorbrewer2.org/#type=sequential&scheme=BuGn&n=3)
+
 ## Open Source GIS Resources
 
 - [spatialreference.org](http://spatialreference.org)
@@ -1004,6 +1014,8 @@ If you're in a class with me - these books are likely to be among the required o
 - [Analyzing US Census Data - Kyle Walker](https://walker-data.com/census-r/)
 
 - [Geospatial Health Data - Paula Moraga](https://www.paulamoraga.com/book-geospatial/)
+
+- [R Markdown Cookbook - Yihui Xie, Christophe Dervieux, Emily Riederer](https://bookdown.org/yihui/rmarkdown-cookbook/)
 
 ## Articles and Other Resources
 
