@@ -819,13 +819,13 @@ Use the function "st_write" like so:
 
 # 10. Publishing Analyses with R Markdown
 
-I will probably be asking you to turn in assignments using R Markdown. Markdown is a way to present your code-based projects as a more polished document (you're reading a markdown right now!). 
+I will probably be asking you to turn in assignments using R Markdown. Markdown is a way to present your code-based projects as a more polished document (you're reading a markdown right now!).  You can use this tool to make repeatable reporting workflows for non-techincal audience using R. [I often write data reports like this one for my clients](https://voicesofcreativedata.nighttime.org/), where I "hide" all the code and just show the outputs.
 
 A markdown document embeds "chunks" of R code in between bits of text. These chunks can simply be bits of code, or they can be code that creates some kind of image like a `ggplot` chart or a `kable` table. You can manipulate the options of a code chunk so that the output appears a certain way.
 
-You can use this tool to make repeatable reporting workflows for non-techincal audience using R. [I often write data reports like this one for my clients](https://voicesofcreativedata.nighttime.org/), where I "hide" all the code and just show the outputs.
+The basic file format of a markdown is `.rmd`. You can "knit" the markdown into a polished document in HTML, pdf or doc format.
 
-If you want to read more about how markdown works - you can find a download button at the top right of this document and download the code that was used to make this.
+If you want to experiment with some markdown language - you can find a download button at the top right of this document and download the code that was used to make this.
 
 For more details on using R Markdown, consult <http://rmarkdown.rstudio.com> or check out [this great book from Xie et al](https://bookdown.org/yihui/rmarkdown-cookbook/).
 
