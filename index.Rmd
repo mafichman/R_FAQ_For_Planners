@@ -1,7 +1,7 @@
 ---
 title: "Intro to R and FAQ for Planners"
 author: "Michael Fichman"
-date: "8/17/2022"
+date: "1/10/2023"
 output: 
   html_document:
     toc: true
@@ -15,25 +15,19 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # 1. Introduction
 
-This is a working document designed to give a basic introduction to R for those who have no coding experience. This should help you get prepared for applied projects in CPLN and MUSA 500-600 level coursework within a couple of weeks. It coalesces introductory materials I've developed over the past five years for MUSA 508, MUSA 795, CPLN 501, and CPLN 675 and should give you what you need to get started in any of those courses.
+This is a document designed to give a basic introduction to R for those who have no coding experience. This should help you get prepared for applied projects in CPLN and MUSA 500-600 level coursework within a couple of weeks. It coalesces introductory materials I've developed over the past six years for MUSA 508, MUSA 795, CPLN 501, and CPLN 675 and should give you what you need to get started in any of those courses.
 
 This isn't a "coding" tutorial, it's a starter kit that demonstrates how R can do some familiar Excel or ArcGIS-like tasks - loading spreadsheets and spatial data, creating new columns of data, summarizing and querying data, making charts and maps - and do them faster, better, and more reproducibly.
 
-Use the table of contents at left to navigate through the document - the simplest topics are first (e.g. "What is R?", "How do I download R?"), the latter sections are more advanced (Geoprocessing, Census Data, Markdown documents). There are references to books and reference materials at the end of the doc.
+Use the table of contents at left to navigate through the document - the simplest topics are first (e.g. "What is R?", "How do I download R?"), the latter sections are more advanced (Geoprocessing, Census Data, Markdown documents). There are references to books and other materials at the end of the doc.
 
-This document will be updated on an ongoing basis (it's a construction site). Right now, sections 1-10 are complete - which is what students in CPLN 675 and MUSA 508 will need to get up and running this year!
+This document will be updated on an ongoing basis to include new packages and methods - you may see a few "Coming soon" previews towards the end of the document.
 
 **Michael Fichman**
 
 *University of Pennsylvania Weitzman School of Design*
 
 *Lecturer, Department of City and Regional Planning*
-
-*Interim Program Director, Masters of Urban Spatial Analytics*
-
-*Researcher, PennPraxis*
-
-*Data Scientist, Center for Safe Mobility*
 
 # 2. Getting Started with R
 
@@ -835,13 +829,13 @@ As you work on increasingly sophisticated or collaborative projects using R, you
 
 Best practices in coding is a subject for a whole entire course, but here are a few simple tips to get you started.
 
-## 11.1 R Projects
+## R Projects
 
 R has a "projects" file-type which can help you keep an organized file structure and working environment in R Studio. There is a file type called `.rProj` that coordinates this. You can open a new project by going to File -> New Project in R Studio. Check out the "Files" part of your R Studio window and see how you can now graphically view your files. Best of all, if you keep things contained in a project, it's more portable from computer to computer because you're just calling files inside one Project.
 
 [Read Hadley Wickham's tutorial](https://r4ds.had.co.nz/workflow-projects.html) on how working with R Projects can help you with organization.
 
-## 11.2 Github
+## Github
 
 Github is a code-collaboration environment that allows you to use "source control" and work on things with others without accidentally over-writing or breaking other peoples' code. Github works well with R Projects. You can "push" and "pull" code and data straight from R Studio or use a program called Github Desktop (which I prefer). You will need an account on Github to make this all work.
 
@@ -862,13 +856,13 @@ Here is a quick step-by-step guide to setting up a collaborative repo, an R proj
 
 The finer mechanics of collaborating with Github are too complex for this document, but [check out Matt Harris' tutorial from MUSA 508 on using Github](https://github.com/mafichman/R_FAQ_For_Planners/blob/main/pdf/Week_1_Lab_Intro_to_Github(1).pdf) for detailed instructions on how to get set up and start collaborating.
 
-### 11.2.1. Github Pages
+### Github Pages
 
 It's a bit weird to send HTML markdowns to clients and n00bs and say "you need to DL this and open it in your browser to see it", but you can easily publish a knit html markdown to the web using github. If you name the markdown (in HTML form) `index`, you can go to your repo settings, and activate the "pages" functionality. This will publish the html file as a github.io webpage.
 
 This page itself is an example - (check out the repo behind it)[https://github.com/mafichman/R_FAQ_For_Planners] to see how this all works!
 
-## 11.3 Writing Readable Code
+## Writing Readable Code
 
 You will probably find yourself writing code that other people have to use - or that you will save and use at some time in the future. It's important to make sure you format and annotate your code so that your colleagues or your future self can use it, understand it, and troubleshoot it.
 
@@ -905,21 +899,21 @@ acsTractsPHL.2016.sf %>%
 
 Check out [https://style.tidyverse.org/index.html](the tidyverse Style Guide) for more info on how to write legible code.
 
-## 11.4 Data management
+## Data and file management
 
-Coming soon!
+New additions for 2023 will include tips on how to organize your R Projects, R scripts, data, markdowns and more.
 
-# 12. Querying APIs
+# 12. Querying APIs and Reading Data from Web Sources
 
-Coming soon:
+New additions for 2023 will include vignettes on Socrata and REST API query functionalities for R, and using two-factor authentification with boxr and PennBox.
 
-TBD incl - Socrata and REST API query functionalities for R, boxr and PennBox
+Presently, vignettes for boxr can be found [https://github.com/mafichman/boxr](at this repo).
 
 # 13. Other Spatial Packages
 
-Coming soon:
+New additions for 2023 will include vignettes on the following packages - Mapview, Leaflet, osmdata, raster/terra, and crs_suggest.
 
-Mapview, Leaflet, osmdata, raster, crs_suggest
+Currently, a vignette on the use of osmdata for Open Street Map data can be found [https://github.com/mafichman/osm_data](at this repo).
 
 # 14. Resources and texts
 
@@ -1003,7 +997,7 @@ Color Palette ideas
 
 If you're in a class with me - these books are likely to be among the required or supplemental readings. They are all fantastic, open source, and extremely, extremely useful. Here they are in "bookdown" form for free.
 
-- [R for Data Science - Hadley Wickham](https://r4ds.had.co.nz/) - Text for CPLN 675
+- [R for Data Science - Hadley Wickham](https://r4ds.had.co.nz/) - Supplementary text for CPLN 675
 
 - [Public Policy Analytics - Ken Steif](https://urbanspatial.github.io/PublicPolicyAnalytics/) - Text for MUSA 508
 
@@ -1023,4 +1017,4 @@ If you're in a class with me - these books are likely to be among the required o
 
 # FAQ
 
-Common Q&A will go here
+Have a question or something you'd like to see included here? Add it to [https://github.com/mafichman/R_FAQ_For_Planners/issues](the "issues" section of the repo for this text!)
