@@ -1,7 +1,7 @@
 ---
 title: "Intro to R and FAQ for Planners"
 author: "Michael Fichman"
-date: "1/10/2023"
+date: "7/20/2023"
 output: 
   html_document:
     toc: true
@@ -25,9 +25,11 @@ This document will be updated on an ongoing basis to include new packages and me
 
 **Michael Fichman**
 
+*Associate Professor of Practice*
+
 *University of Pennsylvania Weitzman School of Design*
 
-*Lecturer, Department of City and Regional Planning*
+*Department of City and Regional Planning*
 
 # 2. Getting Started with R
 
@@ -919,7 +921,7 @@ Currently, a vignette on the use of osmdata for Open Street Map data can be foun
 
 This section contains online resources for learning R and troubleshooting code-based problems.
 
-## Troubleshooting - How to ask a question
+## 14.1. Troubleshooting - How to ask a coding question
 
 It's super important to know how to ask a good question on the internet or on the class forum about some issue you are having. Googling around is a really good way to find help - so you can google something about the error you are having, or look on [https://stackoverflow.com](https://stackoverflow.com), which is a community of people doing Q&A and troubleshooting.
 
@@ -961,7 +963,56 @@ Google query:
 
 "Spatial joins in r with sf"
 
-## R Cheat Sheets
+## 14.2. Troubleshooting using Chat Bots
+
+Generative AI solutions like Chat GPT can be useful aids in debugging code, writing functions, and solving coding problems. It's helpful to think of GPT as a highly structured, highly customized search engine. To get the best results, use the same kind of steps described in the previous section about asking a question on a class message board.
+
+Keep in mind that if you have not educated yourself about how a coding language works, you not only can't ask good questions of a GPT, you cannot audit the results of queries effectively. You might not be able to interpret the varying degrees of wrongness you get from GPT outputs. You might also generate outputs that are either a) inoperable or worse b) functional but fundamentally wrong for your task.
+
+Consider the following situation where I want to `mutate` a new column and I consult ChatGPT about how to format the data. I will provide an example of a good query and a bad query as I try to solve my problem.
+
+I am going to load the data set `mtcars` (a data set about cars and their attributes that comes with R and is often used to create code examples just like this!).
+
+```{r}
+data(mtcars)
+
+head(mtcars)
+```
+
+I'd like to `mutate` a column that is a ratio of horsepower (`hp`) to miles per gallon (`mpg`). Simply, I would say something like this:
+
+`mtcars %>% mutate(hp_mpg_ratio = hp/mpg)`
+
+However, I get tons of decimal places when I do this, and I don't know how to fix that! So I ask ChatGPT:
+
+*How do I round to two decimal places in R?*
+
+ChatGPT will give me a generic code example that I have to interpret and apply to my code, but if I ask it
+
+*Can you adjust this tidy R code to round the output to two decimal places?* 
+
+*mtcars %>% mutate(hp_mpg_ratio = hp/mpg)*
+
+I will get a precise re-working of my code.
+
+The more sophisticated your problem, the more important it is that you ask a very specific question, sometimes even providing background information about packages, data types, and so on.
+
+Let's say I wanted to make a plot of `mpg`, which is a continuous variable, but I am interested in the number of cars that are over or under 20 mpg. I can ask a very specific question like the following:
+
+*How do I adjust this tidy R code so that the continuous variable mpg is engineered as a categorical variable that is either over or under 20. The result should be a bar plot and the feature transformation should take place within the ggplot call.*
+
+*ggplot(mtcars)+ geom_histogram(aes(mpg))*
+
+The result is as follows:
+
+```{r}
+ggplot(mtcars, aes(x = ifelse(mpg > 20, "Over 20", "Under 20"))) +
+  geom_bar(color = "black", fill = "steelblue") +
+  labs(x = "MPG Category", y = "Frequency", title = "Bar Plot of MPG Over/Under 20")
+
+```
+
+## 14.3. R Cheat Sheets
 
 R Studio's website has some really good [cheat sheets](https://www.rstudio.com/resources/cheatsheets/) with simple walkthroughs of basic functions in some core packages
 
@@ -977,7 +1028,7 @@ R Studio's website has some really good [cheat sheets](https://www.rstudio.com/r
 
 - [(readr - loading data)](https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-import.pdf)
 
-## Style Guides
+## 14.4. Style Guides
 
 Handy tips for making your code readable
 
@@ -989,11 +1040,11 @@ Color Palette ideas
 
 - [Color Brewer 2 - Color Palettes and Ramps](https://colorbrewer2.org/#type=sequential&scheme=BuGn&n=3)
 
-## Open Source GIS Resources
+## 14.5. Open Source GIS Resources
 
 - [spatialreference.org](http://spatialreference.org)
 
-## Books
+## 14.6. Books
 
 If you're in a class with me - these books are likely to be among the required or supplemental readings. They are all fantastic, open source, and extremely, extremely useful. Here they are in "bookdown" form for free.
 
@@ -1011,10 +1062,10 @@ If you're in a class with me - these books are likely to be among the required o
 
 - [R Markdown Cookbook - Yihui Xie, Christophe Dervieux, Emily Riederer](https://bookdown.org/yihui/rmarkdown-cookbook/)
 
-## Articles and Other Resources
+## 14.7. Articles and Other Resources
 
 - [A detailed guide to colors in data vis style guides - Lisa Charlotte Muth](https://blog.datawrapper.de/colors-for-data-vis-style-guides/)
 
-# FAQ
+# 14.8. FAQ
 
 Have a question or something you'd like to see included here? Add it to [https://github.com/mafichman/R_FAQ_For_Planners/issues](the "issues" section of the repo for this text!)
