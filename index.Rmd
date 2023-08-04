@@ -907,15 +907,42 @@ New additions for 2023 will include tips on how to organize your R Projects, R s
 
 # 12. Querying APIs and Reading Data from Web Sources
 
-New additions for 2023 will include vignettes on Socrata and REST API query functionalities for R, and using two-factor authentification with boxr and PennBox.
+Upcoming additions include vignettes on Socrata and REST API query functionalities for R, and using two-factor authentification with boxr and PennBox.
 
 Presently, vignettes for boxr can be found [https://github.com/mafichman/boxr](at this repo).
 
 # 13. Other Spatial Packages
 
-New additions for 2023 will include vignettes on the following packages - Mapview, Leaflet, osmdata, raster/terra, and crs_suggest.
+Upcoming additions will include vignettes for some of the following packages - Leaflet, osmdata, raster/terra, and crs_suggest.
 
 Currently, a vignette on the use of osmdata for Open Street Map data can be found [https://github.com/mafichman/osm_data](at this repo).
+
+## 13.1. Interactive Mapping with mapview
+
+The `mapview` package is a quick and easy way to look at spatial data interactively with a basemap. `mapview` can handle many kinds of spatial data, including `sf` vectors. I like to use `mapview` to make quality checks on my data, and quickly scan for patterns at multiple scales. With static maps in `ggplot` with `sf`, sometimes this can be cumbersome. `mapview` has some drawbacks - it's hard to make sophisticated styling, and it can choke on large data sets (more than a few thousand objects).
+
+Here is a really quick web map of our `restaurants` data set from Section 9 in `mapview`
+
+To use `mapview` for the first time you should install and load the package. (If you already have it installed, skip this step):
+
+```{r install_packages_mapview, warning = FALSE, eval = FALSE}
+install.packages('mapview')
+```
+
+Now load them into your R environment with a `library` call:
+
+```{r setup_packages3, warning = FALSE, message = FALSE}
+library(mapview)
+```
+
+Now we can simply feed `restaurants` to the `mapView` function. You can click on the points and see their attributes. Simple!
+
+If you have data to symbologize, you can use the `zcol` argument to specify it.
+
+```{r simple_mapvew, warning= FALSE, message = FALSE}
+mapView(restaurants)
+
+```
 
 # 14. Resources and texts
 
@@ -1051,6 +1078,8 @@ If you're in a class with me - these books are likely to be among the required o
 - [R for Data Science - Hadley Wickham](https://r4ds.had.co.nz/) - Supplementary text for CPLN 675
 
 - [Public Policy Analytics - Ken Steif](https://urbanspatial.github.io/PublicPolicyAnalytics/) - Text for MUSA 508
+
+- [Spatial Statistics for Data Science - Paula Moraga](https://www.paulamoraga.com/book-spatial/index.html)
 
 - [Data Visualization - Kieran Healy](https://socviz.co/)
 
