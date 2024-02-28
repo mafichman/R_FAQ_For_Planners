@@ -805,6 +805,81 @@ Check out the `sf` "cheat sheet" to see what it can do:
 
 [R Studio: sf cheatsheet](https://raw.githubusercontent.com/rstudio/cheatsheets/main/sf.pdf)
 
+### Making a "Fishnet"
+
+A "fishnet" is a raster-like grid where you impose a uniform surface of aerial units - squares or hexagons - across a landscape. This can be really useful for visualizing or processing information.
+
+I can make a "fishnet" grid across Philadelphia County, and join the restaurant point data in order to visualize the density of in a different way.
+
+Let's start by loading a geojson representing Philadelphia County, and coercing it to the sf format using `st_as_sf`. 
+
+Not sure what the projection is? It's important to know - the cellsize you set for your fishnet will be in the native units of the projection. You can find that out using `st_crs` to "ask" your data about the projection. We see that this is in something called `["EPSG",4269]` - there is projection in "degree" and "latitude" - those aren't linear units like feet or meters!
+
+```{r load_county, warning = FALSE, message = FALSE}
+philaCounty <- read_sf("https://raw.githubusercontent.com/mafichman/R_FAQ_For_Planners/main/data/phila_county.geojson") %>%
+  st_as_sf()
+
+st_crs(philaCounty)
+
+```
+Before we make our fishnet, let's project it to a coordinate reference system 2272, which is in feet. How did I choose that Need to find the right coordinate system for your study area? Visit [spatialreference.org](http://spatialreference.org) or use the `crs_suggest` package (more on this in the end references to this document if you're interested.)
+
+```{r transform_county, warning = FALSE, message = FALSE}
+philaCounty <- philaCounty %>%
+  st_transform(2272)
+
+```
+
+
+Finally, let's make our fishnet. We use the `st_make_grid` function to create the fishnet - and we specify that we want the cellsize to equal 2500 - that's in the native units of the projection, feet. We ask for square cells. Check out this data pipeline - we use an operation to keep only the fishnet cells that intersect the original `philaCounty` shape, and then we create a `uniqueID` using a `mutate` command - giving each shape an identifier that is useful for doing analysis later.
+
+
+```{r make_fishnet}
+
+fishnet <- 
+  st_make_grid(philaCounty,
+               cellsize = 2500, 
+               square = TRUE) %>%
+  .[philaCounty] %>%            # clips the grid to the philaCounty extent
+  st_sf() %>%
+  mutate(uniqueID = rownames(.))
+```
+
+Check it out in ggplot!
+
+```{r plot_fishnet}
+ggplot()+
+  geom_sf(data = fishnet)
+
+```
+
+Now we can join our restaurants to the fishnet using the same routine as we used for our tract-based summary, but with a different result because of the different aerial units.
+
+```{r}
+restaurants.and.fishnet <- st_join(restaurants %>%
+                                    st_transform(crs = st_crs(fishnet)), fishnet,
+                                  join = st_intersects,
+                                  left = TRUE)
+
+
+restaurant_fishet_summary <- 
+  restaurants.and.fishnet %>%
+  as.data.frame() %>%
+  group_by(uniqueID) %>%
+  summarize(restaurant_sum = n())
+
+fishnet_and_restaurants <-
+  left_join(fishnet, restaurant_fishet_summary,
+            by = c("uniqueID"))
+
+ggplot()+
+  geom_sf(data = fishnet_and_restaurants, 
+          aes(fill = restaurant_sum),
+          color = "transparent")
+
+```
+
+
 ## Writing spatial data
 
 You can write out any sf objects as .shp files which are readable in ArcGIS. This is especially useful if you want to just use R to grab data efficiently and want to map it elsewhere. I prefer to write geojsons - they are more widely usable and the column names are more stable.
@@ -903,7 +978,7 @@ Check out [https://style.tidyverse.org/index.html](the tidyverse Style Guide) fo
 
 ## Data and file management
 
-New additions for 2023 will include tips on how to organize your R Projects, R scripts, data, markdowns and more.
+New additions for 2024 will include tips on how to organize your R Projects, R scripts, data, markdowns and more.
 
 # 12. Querying APIs and Reading Data from Web Sources
 
