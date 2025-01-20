@@ -1,0 +1,471 @@
+---
+title: "Introduction to Spatial Predictive Modeling for Planners"
+author: "Michael Fichman"
+date: "2025-01-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# 1. Introduction
+
+The world is awash in complex predictive tools and analytics. Some of these tools are very useful for planners and others concerned with social and spatial phenomena. The best way to develop utility with these kinds of tools is by starting with the basics - regression models. These models are interpretable, simple, and often deceptively powerful.
+
+This is a beginner's guide to predictive analytics. It introduces a few model workflows and basic concepts to users who have little or no background working with statistics and/or computer coding. Specifically, it's for urban planners - who have some specific spatial and temporal use cases that are of interest. It is NOT a comprehensive text on regression models. Such texts are many in number, but if you want to get into one - I quite like [Regression and other Stories, by Gelman et al](https://avehtari.github.io/ROS-Examples/examples.html#Introduction).
+
+Each section in this document details a different regression model we will use this semester in Land Use and Environmental Modeling (CPLN 6750), and provides simple workflows in R using sample data sets.
+
+## 1.1. Explanation versus Prediction
+
+You very often see regression models used in scholarly papers to show the "effect of A on B" or the "association between A and B"... "all else equal." In a public policy or planning context, causal and associative applications of regression are very useful for measuring policy effects or understanding social scientific relationships in a statistical framework. This is NOT what we are going to do. You will not hear any "A causes B" in this text.  Furthermore, we are not trying to use controls to isolate the associations between A and B, "all else equal." What this means is that we are going to violate some assumptions (e.g. the "rules") that will make econometric users of regression absolutely cringe.
+
+We are going to use regression models for a different purpose - to estimate outcomes (dependent variables) given a bunch of predictors (independent variables). To give you an example of the difference in approach, if I want to estimate the heights of a number of people, I could do so very accurately if I fed a regression model information about their wingspans. However, that can't tell me anything about WHY a person is so tall.
+
+The key to making above average predictive models is finding good independent variables and harnessing the power of their correlation with the dependent variable to make predictions. They key to making great predictive models is "engineering" good "features" to make models that are both accurate and flexible.
+
+## 1.2. Model Types
+
+We are going to demonstrate the use of three types of models, each is designed to model a different type of outcome. First, we will use Ordinary Least Squares (OLS) regression to estimate normally distributed, continuous outcomes. Second we will use binary logistic regression to estimate 0/1 outcomes (e.g. estimating the probability of an outcome being a 1). Lastly we will use the Poisson regression model to estimate count data.
+
+Your choice of model depends on the use case.
+
+## 1.3. How Do Predictive Models "Work?"
+
+All of these models are built around a simple framework - making a sort of "best fit" line through your data. You've certainly seen an x-y scatterplot with a "best fit" line plotted through the middle. This is actually a simple regression model - an OLS model fits a function that predicts the value of Y for a given X. Functionally, it minimizes the distance between the observations (the error) and the best fit line.
+
+SHOW BEST FIT LINE HERE
+
+Each of the models in this text apply a different fitted function to your data, but in the end, the predictive functionality is similar - they all output the "average" estimate given all the independent variables in the model.
+
+## 1.4 Validating Models
+
+How do you know if your predictive model is doing a good job? We can split our data. We "train" our model using a portion of our data, and hold out a "test" set with all the same characteristics. When we "show" our model the independent variables from our test set, we can make predictions
+
+We will have a few ways to judge that:
+
+- Is the model accurate on unseen data? Are the predictions close to the known values in our test set?
+
+- Does the model performance generalize accross contexts? Do we have big errors with some particular category of observation and small ones with another?
+
+The "error metrics" vary depending on what type of model you are using, as we will see.
+
+## 1.5. R Packages
+
+We will use a few basic packages in this text.
+
+If you do not have any of the packages listed below installed on your computer, install them like so:
+
+```{r install_pkg, eval=FALSE, include=TRUE}
+install.packages('tidyverse')
+```
+
+If you have already installed a package on your computer, you can load it into your environment using the `library` command.
+
+```{r load_pkg , message = FALSE, warning = FALSE}
+library(tidyverse)
+library(sf)
+library(caret)
+library(readr)
+```
+
+
+# 2. Ordinary Least Squares Linear Regression
+
+Model - estimate the number of .... 
+
+We don't care about R-squared
+
+
+## 2.1. Data set
+
+We are going to use a [data set from the World Bank](https://www.kaggle.com/datasets/patelris/crop-yield-prediction-dataset?select=yield.csv) to see if we can predict national crop yields. This data set consists of agricultural yields for many types of crops in over 100 countries over a series of years. There is accompanying info about yearly rainfall and temperature. I have cleaned these data a bit to consist only of a few years. 
+
+Let's say we are interested in food system planning, and we want to be able to predict the yield (weight per hectre) for several crop types - maize, wheat, etc., under several scenarios for the coming year related to rainfall and temperature - a hot year, a rainy year, etc.,
+
+```{r load data}
+yield_df <- read_csv("~/GitHub//R_FAQ_For_Planners/modeling/data/yield_df.csv") %>%
+  rename(yield_hg_per_ha = `hg/ha_yield`) %>%
+  group_by(Area) %>% 
+  arrange(Item, Year) %>% 
+  group_by(Area, Item) %>% 
+  mutate(yield_last_year = lag(yield_hg_per_ha)) %>%
+  ungroup() %>%
+  filter(Year > 2010) %>%
+  group_by(Area, Item, Year) %>%
+  slice(1) %>%
+  ungroup() %>%
+  filter(is.na(yield_last_year) == FALSE)
+```
+
+## 2.2. Exploratory Analysis
+
+The first step is always to do a few quick pieces of exploratory data analysis - looking at the data types in your set, the distributions of the data, and the correlations between different variables.
+
+### 2.2.1. Data types
+
+The `glimpse` command from `dplyr` in the `tidyverse` is the best way to quickly get a look at your data. Here we see that we have rows that have a column id, a country, a crop type, a year, yield per hectare (our continuous dependent variable)
+
+```{r}
+glimpse(yield_df)
+```
+
+## 2.3. A Simple Model
+
+Here's a simple example so we can take a look at our modeling outputs. We predict yield using only rain fall, temperature and the amount of pesticides. This model is called `reg1`. We create the model using the `lm` function, which takes a data set, and an equation with a dependent variable (`yield_hg_per_ha`), then you put the independent variables on the other side of a `~` thingy.
+
+coefficients
+p-values
+r-squared
+
+This is a very naive model - it explains only 2% of the variance in yield (our R-squared value).... but do we care about that? No, not really. We want to know whether these variables in this model predict yields well. Let's add some more variables -the type of crop, and the country where it was grown.
+
+```{r}
+
+reg1 <- lm(data = yield_df, yield_hg_per_ha ~ average_rain_fall_mm_per_year + avg_temp + pesticides_tonnes)
+
+summary(reg1)
+
+```
+## 2.4. Fixed Effects
+
+Fixed effects for crop and area.
+
+What is a fixed effect?  How do we interpret the 
+
+```{r}
+
+reg2 <- lm(data = yield_df, yield_hg_per_ha ~ average_rain_fall_mm_per_year + avg_temp + pesticides_tonnes + Item + Area + Year)
+
+summary(reg2)
+
+```
+
+## 2.5. Training and Testing
+
+### 2.5.1. Splitting our Data
+
+Set Seed
+
+Why 70/30?
+
+paste command
+
+```{r}
+set.seed(1234)
+
+inTrain <- createDataPartition(
+              y = paste(yield_df$Area), 
+              p = .70, list = FALSE)
+
+
+yield_training <- yield_df[inTrain,] 
+yield_test <- yield_df[-inTrain,]  
+```
+
+### 2.5.2. Creating a Regression
+
+Regression with fixed effects.... actually a model using the lag is way better
+
+```{r}
+reg.training_1 <- 
+  lm(data = yield_df, 
+     yield_hg_per_ha ~ average_rain_fall_mm_per_year + 
+                       avg_temp + pesticides_tonnes + Item + Area)
+
+```
+
+
+
+```{r}
+yield_test_with_results <-
+  yield_test %>%
+  mutate(Prediction = predict(reg.training_1, yield_test),
+         Error = Prediction - yield_hg_per_ha,
+         AbsError = abs(Prediction - yield_hg_per_ha),
+         Abs_Pct_Error = (abs(Prediction - yield_hg_per_ha)) / yield_hg_per_ha)
+```
+
+
+```{r}
+yield_test_with_results %>%
+  summarize(MAPE = mean(Abs_Pct_Error),
+         MAE = mean(AbsError))
+
+```
+
+
+Generalizability across contexts
+
+```{r}
+yield_test_with_results %>%
+  group_by(Item) %>%
+  summarize(MAPE = mean(Abs_Pct_Error),
+         MAE = mean(AbsError))
+
+```
+
+# 3. Binary Logistic Regression for Classification
+
+## 3.1. Data set
+
+This is a data set about tree survival published [by the aptly named Wood et al](https://datadryad.org/stash/dataset/doi:10.5061/dryad.xd2547dpw) at Michigan State. These data consist of ~2700 observations of trees, whether they are dead or alive, and a list of traits of that tree and the immediate environment.
+
+The "use case" for our modeling example will be a forester who is interested in managing land for fire load and looking to target trees that they estimate are likely to be dead for removal and sale as timber product.
+
+```{r}
+trees <- read_csv ("~/GitHub/R_FAQ_For_Planners/modeling/data/tree_morbidity.csv") %>%
+  filter(is.na(Event)== FALSE) %>%
+  mutate(Species = as.factor(Species),
+         Event = as.factor(Event))
+
+```
+
+## 3.2. Exploratory Analysis
+
+## 3.2.1. Looking at our data set
+
+```{r}
+glimpse(trees)
+
+```
+
+## 3.2.2. Comparing continuous predictors across levels
+
+We can use some simple `dplyr` logic to look at whether the mean values of our continuous variables tend to be different depending on whether our `Event` binary outcome is 1 or 0.
+
+At first glance, it looks like lower concentration of lignin and phenolics in the organism is associated with death, as is time (which is time from planting to harvesting).
+
+```{r}
+trees %>%
+  select(Event, Time, NSC, Lignin, Phenolics, EMF, AMF) %>%
+  gather(-Event, key = "variable", value = "value") %>%
+  group_by(variable, Event) %>%
+  summarize(mean = mean(value, na.rm = TRUE)) %>%
+ggplot()+
+  geom_bar(aes(y = mean, x = Event), stat = "identity")+
+  facet_wrap(~variable, scales = "free")+
+    theme_bw()
+
+```
+
+Another approach worth trying is looking at the distributions of the different variables by making histograms that are split by 0/1 and by variable.
+
+Using this approach I can see that amongst trees that die, lignin and phenolics and NSC seem to have right tailed distributions, and there's a discrete split at a certain value. We can also see that something seems kind of weird with the "Time" variable - maybe it represents two harvest periods.
+
+```{r}
+trees %>% 
+    select(Event, Time, NSC, Lignin, Phenolics, EMF, AMF) %>%
+    gather(-Event, key = "variable", value = "value") %>%
+    ggplot()+
+    geom_histogram(aes(value))+
+    facet_grid(Event~variable, scales = "free")+
+    theme_bw()
+
+```
+
+
+## 3.2.3. Comparing categorical predictors across levels
+
+We can use some simple `dplyr` logic to look at whether our categorical variables vary depending on whether our `Event` binary outcome is 1 or 0.
+
+It seems like species has a big effect - huge differences between the species in the frequency of 0's and 1's.
+
+
+```{r}
+trees %>%
+  select(Event, Soil, Sterile, Conspecific, Myco, SoilMyco, Species) %>%
+  gather(-Event, key = "variable", value = "value") %>%
+  count(variable, value, Event) %>%
+  ggplot()+
+  geom_bar(aes(value, n, fill = Event), 
+           position = "dodge", stat="identity") +
+  facet_wrap(~variable, scales="free") +
+  coord_flip()+
+    theme_bw()
+
+```
+
+## 3.3. A Simple Model
+
+You can play around with lots of different combinations in the model
+
+Soil types and Mycorrhizal types seem to be very collinear, so I've left them out of the model...
+
+Feature engineering thing - based on exploratory analysis, cut lignin etc. up a categorical variables.
+
+mutate(Lignin = ifelse(Lignin > 15, "High", "Low"))
+
+Logit function
+Coefficients
+McFadden
+p-values
+
+```{r}
+
+reg_logit <- glm(data = trees , 
+                 Event ~ Light_ISF + NSC + Lignin + Phenolics + Species + Soil,
+                 family="binomial")
+
+summary(reg_logit)
+
+```
+
+Interpret the coefficients
+
+The odds of a _____ dying are X times that of a _______
+
+All else equal, the odds of a tree dying increase by x% (e.g. 1.14 is 14%) with a unit change in the independent variable.
+
+```{r}
+exp_coef <- reg_logit$coefficients %>%
+  as.data.frame() %>%
+  rename(coefficient = ".") %>%
+  mutate(exponentiated = exp(coefficient))
+
+```
+
+
+## 3.4. Training and Testing
+
+```{r}
+set.seed(1234)
+
+treetrainIndex <- createDataPartition(y = paste(trees$Species, trees$Soil), 
+                                  p = .70,
+                                  list = FALSE,
+                                  times = 1)
+
+treeTrain <- trees[ treetrainIndex,]
+treeTest  <- trees[-treetrainIndex,]
+
+```
+
+```{r}
+logit_train <- glm(data = treeTrain, Event ~ Light_ISF + NSC + Lignin + Phenolics +  
+                                       Species + Soil,
+                 family="binomial"(link="logit"))
+```
+
+```{r}
+
+treeTest_with_results <-
+  treeTest %>%
+  mutate(estimate = predict(logit_train, .,  type="response"))
+
+```
+
+Let's talk about how to interpret this and what the threshold should be.
+
+```{r}
+treeTest_with_results %>%
+  ggplot()+
+  geom_histogram(aes(estimate))+
+  facet_wrap(~Event, nrow= 2)+
+  theme_bw()
+
+```
+### 3.4.2. Confusion Metrics
+
+Let's create the results again but let's add the threshold to classify 1/0
+
+```{r}
+
+treeTest_with_results <-
+  treeTest %>%
+  mutate(estimate = predict(logit_train, .,  type="response"),
+         prediction = as.factor(ifelse(estimate >= 0.4, 1, 0)))
+  
+
+```
+
+True Positive
+True Negative
+False Positive
+False Negative
+
+Accuracy
+
+Sensitivity
+Specificity
+
+```{r}
+caret::confusionMatrix(treeTest_with_results$prediction, as.factor(treeTest_with_results$Event), positive = "1")
+
+```
+
+You can make your own version of this using `mutate` commands, and then assess model accuracy across categories.
+
+If we look at our model performance across species, we see that our model tends to predict negatives (eg 0) for our Quercus species - be those true or false negatives. 
+
+```{r}
+treeTest_with_results %>%
+  mutate(outcome = case_when(prediction == 1 & Event == 1 ~ "TP",
+                             prediction == 1 & Event == 0 ~ "FP",
+                             prediction == 0 & Event == 0 ~ "TN",
+                             prediction == 0 & Event == 1 ~ "FN")) %>%
+  group_by(Species, outcome) %>%
+  summarize(
+    count = n(),                              # Count the number of rows for each outcome
+    .groups = "drop"
+  ) %>%
+  group_by(Species) %>%
+  mutate(
+    total = sum(count),                       # Total outcomes per species
+    rate = count / total                      # Rate of each outcome within species
+  ) %>%
+  ggplot()+
+  geom_bar(aes(x = outcome, y = rate), stat = "identity")+
+  facet_wrap(~Species)+
+  theme_bw()
+
+```
+
+ROC & AUC
+
+# 4. Feature engineering methods
+
+The key to making a really good model is engineering independent variables that are stronly predictive of the dependent variable. This might mean joining your data to a new data set, recategorizing variables you already have in your set, or transforming them to get more predictive power.
+
+Maybe do this with some housing data - spatial fixed effects, st_distance, reclassification, log transformation
+
+
+Reclassification
+Normalization
+Transformation
+knn
+spatial join
+
+# 5. Data Dictionaries
+
+## 5.2. Wood Et Al
+
+
+    - No: Seedling unique ID number.
+    - Plot: Number of the field plot the seedling was planted in. (1-18)
+    - Subplot: Subplot within the main plot the seedling was planted in. Broken into 5 subplots (1 per corner, plus 1 in the middle). (A-E)
+    - Species: Includes Acer saccharum, Prunus serotina, Quercus alba, and Quercus rubra.
+    - Light ISF: Light level quantified with HemiView software. Represents the amount of light reaching each subplot at a height of 1m.
+    - Light Cat: Categorical light level created by splitting the range of Light_ISF values into three bins (low, med, high).
+    - Core: Year the soil core was removed from the field.
+    - Soil: Species from which the soil core was taken. Includes all species, plus Acer rubrum, Populus grandidentata, and a sterilized conspecific for each species.
+    - Adult: Individual tree that soil was taken from. Up to 6 adults per species. Used as a random effect in analyses.
+    - Sterile: Whether the soil was sterilized or not.
+    - Conspecific: Whether the soil was conspecific, heterospecific, or sterilized conspecific.
+    - Myco: Mycorrhizal type of the seedling species (AMF or EMF).
+    - SoilMyco: Mycorrhizal type of the species culturing the soil (AMF or EMF).
+    - PlantDate: The date that seedlings were planted in the field pots.
+    - AMF: Percent arbuscular mycorrhizal fungi colonization on the fine roots of harvested seedlings.
+    - EMF: Percent ectomycorrhizal fungi colonization on the root tips of harvested seedlings.
+    - Phenolics: Calculated as nmol Gallic acid equivalents per mg dry extract (see manuscript for detailed methods)
+    - NSC: Calculated as percent dry mass nonstructural carbohydrates (see manuscript for detailed methods)
+    - Lignin: Calculated as percent dry mass lignin (see manuscript for detailed methods)
+    - Census: The census number at which time the seedling died or was harvested.
+    - Time: The number of days at which time the seedling died or was harvested.
+    - Event: Used for survival analysis to indicate status of each individual seedling at a given time (above)
+        0 = harvested or experiment ended
+        1 = dead
+    - Harvest: Indicates whether the seedling was harvested for trait measurement.
+    - Alive: Indicates if the seedling was alive at the end of the second growing season. "X" in this field indicates alive status.
