@@ -1,17 +1,22 @@
 ---
 title: "Introduction to Applied Predictive Modeling"
 author: "Michael Fichman"
-date: "2025-01-30"
+date: "2025-02-14"
 output:
   html_document:
     toc: true
     toc_float: true
-    code_folding: hide
     code_download: true
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(kableExtra)
+library(tidyverse)
+library(sf)
+library(caret)
+library(readr)
+library(plotROC)
 ```
 
 
@@ -29,13 +34,17 @@ Each section in this document details a different regression model we will use t
 
 2. Understand how regression models can be used to estimate outcomes, and learn how model selection is related to the outcome of interest.
 
-3. Observe and understand the training and testing workflow used to validate models in R.
+3. Observe and understand the training and testing workflow used to validate models in R with the `caret` package.
 
-4. Learn basic terminology and statistics associated with OLS and binomial logit regression.
+4. Learn basic terminology and statistics associated with OLS and binomial logit regression and the `lm` and `glm` functions for building models.
 
 5. Understand the notion of model "accuracy" and "generalizability"
 
 6. Learn how feature engineering and spatial data can be used to improve model quality.
+
+**Instructions**
+
+You can use this document in two ways. You can read along and look at the code, charts and outputs, or you can run the code in R-Studio and observe how it works.
 
 ## 1.1. Explanation versus Prediction
 
@@ -51,15 +60,23 @@ The key to making above average predictive models is finding good independent va
 
 *Your choice of model depends on the use case - is the outcome you are interested in binomial or continuous?*
 
-There are other models for different outcome types not covered here, including Poisson regression for count data.
+There are other models for different outcome types not covered here, including Poisson regression for count data. Here is a basic guide to some linear models by dependent variable (DV) type.
+
+```{r , echo=FALSE}
+as.data.frame(cbind(c("OLS", "Logit", "Poisson"), c("Continuous", "Binary", "Counts"), c("Home Prices", "Inspection Pass/Fail of Restaurants", "Inspection Violations by Neighborhood"))) %>%
+  rename("Model Type" = V1,
+         "DV Type" = V2,
+         "DV Example" = V3) %>%
+  kable() %>%
+  kable_styling()
+
+```
 
 ## 1.3. How Do Predictive Models "Work?"
 
 All of these models are built around a simple framework - making a sort of "best fit" line through your data. You've certainly seen an x-y scatterplot with a "best fit" line plotted through the middle. This is actually a simple regression model - an OLS model fits a function that predicts the value of Y for a given X. Functionally, it minimizes the distance between the observations (the error) and the best fit line.
 
-```{r echo=FALSE, message=FALSE, include=FALSE}
-
-library(tidyverse)
+```{r message=FALSE, echo=FALSE}
 
 # Set seed for reproducibility
 set.seed(123)
@@ -119,7 +136,7 @@ If you have already installed a package on your computer, you can load it into y
 
 `plotROC` is a package used to create an ROC curve - a diagnostic test for logit models.
 
-```{r load_pkg , message = FALSE, warning = FALSE}
+```{r load_pkg, eval=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(sf)
 library(caret)
@@ -132,9 +149,9 @@ library(plotROC)
 
 OLS regression, or multiple linear regression, is a simple model that can estimate the value of a continuous outcome - like prices or quantities. It's not good for count data, like numbers of incidents. It is simple, interpretable, and widespread.
 
-You've very likely seen "best fit" lines applied to an x-y scatterplot. The line is plotted to minimize the distance between the points and the line - that difference is the "error" associated with this estimate of the relationship. That's essentially what regression does, but fitting multiple lines for multi-dimensional data.
+You've very likely seen "best fit" lines applied to an x-y scatterplot. The line is plotted to minimize the distance between the points and the line - that difference (in the aggregate) is the "error" associated with this estimate of the relationship. That's essentially what regression does, but it can fit multiple lines for multi-dimensional data.
 
-```{r, message = FALSE}
+```{r echo=FALSE, message=FALSE}
 # Set seed for reproducibility
 set.seed(123)
 
@@ -162,8 +179,10 @@ We are going to use a [data set from the World Bank](https://www.kaggle.com/data
 
 Let's say we are interested in food system planning, and we want to be able to predict the yield (weight per hectre) for several crop types - maize, wheat, etc., under several scenarios for the coming year related to rainfall and temperature - a hot year, a rainy year, etc.,
 
+We can load our data from a URL where it is hosted on github:
+
 ```{r load data, warning = FALSE, message = FALSE}
-yield_df <- read_csv("~/GitHub/R_FAQ_For_Planners/modeling/data/yield_df_clean.csv")
+yield_df <- read_csv("https://raw.githubusercontent.com/mafichman/R_FAQ_For_Planners/refs/heads/main/modeling/data/yield_df_clean.csv")
 ```
 
 ## 2.2. Exploratory Analysis
@@ -189,7 +208,10 @@ yield_df %>%
   ggplot()+
   geom_histogram(aes(value))+
   facet_wrap(~variable, scales = "free")+
-  theme_minimal()
+  theme_minimal()+
+  labs(title = "Distribution of Continuous Variables",
+       x = "Continuous Variable Value",
+       y = "Count of observations")
 
 
 ```
@@ -208,7 +230,20 @@ yield_df %>%
   ggplot()+
   geom_point(aes(x = value, y = yield_hg_per_ha))+
   facet_wrap(~variable, scales = "free")+
-  theme_minimal()
+  theme_minimal() +
+  labs(title = "Correlations Between Continuous Variables and Yields",
+       x = "Continuous Variable Value",
+       y = "Crop Yield (hg/ha)")
+```
+
+The Pearson's product-moment correlation, aka "Pearson's R" is a simple test of correlation between two continuous variables. It runs between -1 (strong negative correlation), and 1 (strong positive). A Pearson's R of 0 would mean no relationship.
+
+Let's look at the Pearson's R between our yield and pesticide application - it's pretty small - 0.05 is the "sample estimate" we see in the output from the `cor.test` function to calculate Pearson's R.
+
+```{r}
+
+cor.test(yield_df$yield_hg_per_ha, yield_df$pesticides_tonnes)
+
 ```
 
 ### 2.2.4. Correlations - Categorical variables
@@ -225,7 +260,10 @@ yield_df %>%
   geom_bar(aes(x = value, y = yield_hg_per_ha), stat = "identity")+
   facet_wrap(~variable, scales = "free")+
   coord_flip()+
-  theme_minimal()
+  theme_minimal() +
+  labs(title = "Yields By Country and Crop Type",
+       x = "",
+       y = "Yield (Hg/ha")
 ```
 
 ## 2.3. A Simple Model
@@ -362,7 +400,9 @@ Not bad! On average, we can predict yearly crop yields within 13%.
 ```{r}
 yield_test_with_results %>%
   summarize(MAPE = mean(Abs_Pct_Error),
-         MAE = mean(AbsError))
+         MAE = mean(AbsError)) %>%
+  kable() %>%
+  kable_styling()
 
 ```
 
@@ -374,7 +414,9 @@ We can group our results by `Item` and summarize our errors by crop type. As you
 yield_test_with_results %>%
   group_by(Item) %>%
   summarize(MAPE = mean(Abs_Pct_Error),
-         MAE = mean(AbsError))
+         MAE = mean(AbsError)) %>%
+  kable() %>%
+  kable_styling()
 
 ```
 
@@ -387,7 +429,7 @@ It does this by fitting an s-shaped function to 0/1 data, unlike OLS, which fits
 The tricky part is that you end up with predictions that range from 0-1, and you need to figure out what threshold to use to classify your predictions, which may be values like 0.7 or 0.35, as "1" or "0".
 
 
-```{r, message = FALSE}
+```{r, message = FALSE, echo = FALSE}
 
 
 # Generate predictor variable (x)
@@ -425,7 +467,7 @@ This is a data set about tree survival published [by the aptly named Wood et al]
 The "use case" for our modeling example will be a forester who is interested in managing land for fire load and looking to target trees that they estimate are likely to be dead for removal and sale as timber product.
 
 ```{r, message = FALSE, warning = FALSE}
-trees <- read_csv ("~/GitHub/R_FAQ_For_Planners/modeling/data/tree_morbidity.csv") %>%
+trees <- read_csv ("https://raw.githubusercontent.com/mafichman/R_FAQ_For_Planners/refs/heads/main/modeling/data/tree_morbidity.csv") %>%
   filter(is.na(Event)== FALSE) %>%
   mutate(Species = as.factor(Species),
          Event = as.factor(Event))
@@ -460,7 +502,10 @@ trees %>%
 ggplot()+
   geom_bar(aes(y = mean, x = Event), stat = "identity")+
   facet_wrap(~variable, scales = "free")+
-    theme_bw()
+    theme_bw()+
+  labs(title = "Mean Values of Continuous Variables, by Outcome",
+       x = "Tree Mortality Event",
+       y = "Mean Variable Value")
 
 ```
 
@@ -475,7 +520,10 @@ trees %>%
     ggplot()+
     geom_histogram(aes(value))+
     facet_grid(Event~variable, scales = "free")+
-    theme_bw()
+    theme_bw()+
+  labs(title = "Distribution of Continuous Variables",
+       x = "Continuous Variable Value",
+       y = "Count of observations")
 
 ```
 
@@ -497,7 +545,10 @@ trees %>%
            position = "dodge", stat="identity") +
   facet_wrap(~variable, scales="free") +
   coord_flip()+
-    theme_bw()
+    theme_bw() +
+  labs(title = "Counts of Continuous Variables across Categories, by Mortality State",
+       x = "",
+       y = "Count of observations")
 
 ```
 
@@ -537,7 +588,9 @@ exp_coef <- reg_logit$coefficients %>%
 ```
 
 ```{r}
-exp_coef
+exp_coef %>%
+  kable() %>%
+  kable_styling()
 
 ```
 
@@ -606,7 +659,10 @@ Let's examine a histogram of our estimates to see what our range of values is. W
 ```{r, warning = FALSE, message = FALSE}
 ggplot()+
   geom_histogram(data = treeTest_with_results, aes(estimate))+
-  theme_bw()
+  theme_bw() +
+  labs(title = "Distribution of Model Estimates",
+       x = "Estimate",
+       y = "Count of prediction observations")
 
 ```
 
@@ -621,7 +677,10 @@ treeTest_with_results %>%
   ggplot()+
   geom_histogram(aes(estimate))+
   facet_wrap(~Event, nrow= 2)+
-  theme_bw()
+  theme_bw()+
+  labs(title = "Distribution of Model Estimates - By True Outcome",
+       x = "Estimate",
+       y = "Count of prediction observations")
 
 ```
 
@@ -687,7 +746,10 @@ treeTest_with_results %>%
   ggplot()+
   geom_bar(aes(x = outcome, y = rate), stat = "identity")+
   facet_wrap(~Species)+
-  theme_bw()
+  theme_bw() +
+  labs(title = "Rates of Model Outcomes, by Species",
+       x = "Model Outcome",
+       y = "Rate")
 
 ```
 
@@ -702,7 +764,8 @@ ggplot(treeTest_with_results, aes(d = as.numeric(Event), m = as.numeric(estimate
   geom_roc(n.cuts = 50, labels = FALSE) + 
   style_roc(theme = theme_grey) +
   geom_abline(slope = 1, intercept = 0, size = 1.5, color = 'grey')+
-  theme_bw()
+  theme_bw()+
+  labs(title = "ROC Curve")
 
 ```
 
@@ -711,6 +774,8 @@ ggplot(treeTest_with_results, aes(d = as.numeric(Event), m = as.numeric(estimate
 The key to making a really good model is engineering independent variables that are strongly predictive of the dependent variable. In the examples above, the data sets we used were very clean, and had good predictive accuracy as-is. In real life, that's not usually the case. To make a good model, you need to use your intuition about the phenomenon you are modeling to form a hypothesis about what kind of information might be predictive of your outcome.
 
 This might mean joining your data to a new data set (using a tabular or spatial join), recategorizing variables you already have in your set, or transforming them to conform to the assumptions of the model type in order get more predictive power.
+
+This section presents a sampling of feature engineering methods, including some spatial feature creation techniques.
 
 ## 4.1. Data
 
@@ -722,13 +787,15 @@ For homes, this means the price is a function of the internal characteristics (n
 
 Let's load in some data - these are spatial data (geojson), which we can read using `st_read` from the `sf` package. Each house has a point geometry associated with it.
 
-```{r, message=FALSE, warning = FALSE, echo = FALSE, results = 'hide'}
+```{r, message=FALSE, warning = FALSE, results = 'hide'}
 
-homes <- st_read("~/GitHub/R_FAQ_For_Planners/modeling/data/homes.geojson") %>%
+homes <- st_read("https://raw.githubusercontent.com/mafichman/R_FAQ_For_Planners/refs/heads/main/modeling/data/homes.geojson") %>%
   st_as_sf() %>%
   st_transform(4326)
 
 ```
+
+
 We can make a very basic hedonic model using bedrooms, bathrooms, year built, and total livable area to see how much variance our basic predictors explain in the dependent variable `sale_price`.
 
 The R-Squared is about .51.
@@ -742,12 +809,16 @@ summary(lm(data = homes, sale_price ~ year_built + number_of_bedrooms + number_o
 
 ## 4.2. Reclassification
 
-I have a hypothesis that the relationship between a house's age and it's sale price is not continuous. A new house might be very desirable, a post-war house might be in need of major renovations, and a house built in the 1700s or 1800s might have historic appeal. Take a look at the scatterplot below:
+I have a hypothesis that the relationship between a house's age and it's sale price is not continuous. A new house might be very desirable, a post-war house might be in need of major renovations, and a house built in the 1700s or 1800s might have historic appeal. Take a look at the scatterplot below - there are some time "bands" of very high value homes, and some that are less valuable.
+
 
 ```{r}
 ggplot(homes)+
   geom_point(aes(x = year_built, y = sale_price))+
-  theme_bw()
+  theme_bw()+
+  labs(title = "Sale Price as a Function of Year of Construction",
+       x = "Year Built",
+       y = "Sale Price (2023)")
 
 ```
 
@@ -791,9 +862,9 @@ We can join our homes to the zip codes to which they belong. This creates a prox
 
 Let's load a shape of Philadelphia zip codes and make sure it's projected in crs = 4326 (same as our homes) by using `st_transform`.
 
-```{r, message = FALSE, warning = FALSE, echo = FALSE, results = 'hide'}
+```{r, message = FALSE, warning = FALSE, results = 'hide'}
 
-zips <- st_read("~/GitHub/R_FAQ_For_Planners/modeling/data/zctas_philly.geojson") %>%
+zips <- st_read("https://raw.githubusercontent.com/mafichman/R_FAQ_For_Planners/refs/heads/main/modeling/data/zctas_philly.geojson") %>%
   st_as_sf() %>%
   st_transform(4326)
 
@@ -810,6 +881,23 @@ We can code zip code as a categorical variable - each "neighborhood" represents 
 
 homes <- homes %>%
   mutate(zip_code = as.factor(zip_code))
+
+```
+
+
+When we calculate and plot the mean sales price by zip code, we can see that this is a potentially powerful predictor - there is very wide variation across zip codes.
+
+```{r}
+homes %>% 
+  group_by(zip_code) %>% 
+  summarize(mean_price = mean(sale_price)) %>% 
+  ggplot()+ 
+  geom_bar(aes(x = fct_reorder(zip_code, mean_price), y = mean_price), stat = "identity")+ 
+  coord_flip()+
+  theme_bw()+
+  labs(title= "Mean Single Family Home Sale Price by Zip Code, 2023",
+       x = "Zip Code",
+       y = "Mean Sales Price, 2023 ($)")
 
 ```
 
@@ -843,36 +931,96 @@ homes$lagPriceSqFt <- lag.listw(spatialWeights, homes$sale_price/homes$total_liv
 ```
 
 
+The lagged sale price is very strongly correlated with sale price, so this suggests it will be a good predictor in our linear model.
+
+```{r}
+
+cor.test(homes$sale_price, homes$lagPriceSqFt)
+
+```
+
+
 ```{r}
 summary(lm(data = homes, sale_price ~ bedrooms_categorical + number_of_bathrooms + total_livable_area + age_categorical + zip_code + lagPriceSqFt))
 
 ```
-## 4.4 Variable Transformations and Interactions
+
+## 4.4 Variable Transformations, Interactions and Other Techniques
 
 One of the core assumptions of regression modeling is that variables be normally distributed. With predictive modeling, we sometimes play fast and loose with assumptions, but the models do perform better when this is the case.
 
-Here are a few ways you can transform your variables.
+Here are some ways you can transform your variables and your data.
 
-**Normalization** - you can use rate statistics or ratios as your modeling yardsticks. Perhaps it's more accurate to estimate price-per-square-foot than raw price.
+**Normalization** - you can use rate statistics or ratios as your modeling yardsticks. In the above example, we used the k-nearest neighbor price-per-square-foot, so that the size of nearby homes is not biasing our "comps" variable.
 
 **Standardization** - you can recenter your variables in a normal distribution centered on zero. Linear regression functions better with normally distributed variables.
 
 **Transformation** - You can take variables that aren't normally distributed and transform them using log transformation. This is done very often with pricing models, where home prices are logged before modeling.
 
+**Outlier Removal** - Are we concerned that a few unusual cases are making it harder for our model to perform well? Throwing away outliers can help our model training process.
+
 A last engineering technique is to "interact" variables.
 
 **Interactions** - When the relationship between an independent predictor and the dependent variable depend on another predictor variable, you can *interact* the two variables in the model using the `*` multiply sign.
 
+# 5. Model Cross-Validation
 
-# 5. Data Dictionaries
+We made one training and testing split - but that might mean that our accuracy is an artifact of the training data we had, or the test data we used to validate it the first time.
 
-## 5.1. Crop Yield Dataset
+A way to know if we had some dumb luck with our accuracy is to make many, many, training and testing set splits.
 
-    - 
+This can be done with something called k-fold cross-validation, where we can make as many random splits as we want and train and test models. 
 
+Let's try this out with our Philadelphia housing data. Let's set k to be 100 and run our train/test split 100 times.
 
-## 5.2. Wood Et Al
+This is done with the `trainControl` function from `caret` using the method `cv` for Cross-Validation.
 
+```{r, warning = FALSE, message = FALSE}
+fitControl <- trainControl(method = "cv", number = 100)
+set.seed(825)
+
+reg.cv <- 
+  train(sale_price ~ ., data = homes %>% 
+                                        as.data.frame() %>%
+                                        select(bedrooms_categorical, number_of_bathrooms , 
+                                               total_livable_area, age_categorical, zip_code, 
+                                               lagPriceSqFt, sale_price), 
+     method = "lm", trControl = fitControl, na.action = na.pass)
+
+```
+
+We can plot those errors for all of our 100 test sets - and we see that we have a normal distribution of errors, centered around $70k per house
+
+```{r message = FALSE, warning = FALSE}
+ggplot(as.data.frame(reg.cv$resample)) + 
+  geom_histogram(aes(MAE), binwidth = 5000) +
+  labs(title = "Mean Absolute Price Errors for 100-fold CV",
+    x="MAE Price Estimates ($)",
+       y="Count Models")+
+  theme_bw()
+
+```
+
+There are some other methods for cross-validation worth mentioning.
+
+With "Leave One Group Out" cross-validation - you can build a housing price model using all but one Philadelphia zip code, and see if it is accurate in the "hold out" zip code.
+
+You can do this spatially as well - holding out individual geometries from training and subjecting them as test sets to see how well your model performs on "unseen" data.
+
+# 6. Data Dictionaries
+
+## 6.1. Crop Yield Dataset
+
+    - Area - The country
+    - Item - The crop
+    - Year - The year of the observation
+    - yield_hg_per_ha - Average crop yield in hectograms per hectre
+    - average_rain_fall_mm_per_year - Average rainfall in that year in that country
+    - pesticides_tonnes - Average pesticide application to that crop in that country, in that year
+    - avg_temp - Average temperatures in that country in that year (c)
+    - yield_last_year - A variable I calculated representing the previous year's yield in that country for that crop
+
+## 6.2. Wood Et Al
 
     - No: Seedling unique ID number.
     - Plot: Number of the field plot the seedling was planted in. (1-18)
@@ -900,3 +1048,7 @@ A last engineering technique is to "interact" variables.
         1 = dead
     - Harvest: Indicates whether the seedling was harvested for trait measurement.
     - Alive: Indicates if the seedling was alive at the end of the second growing season. "X" in this field indicates alive status.
+    
+## 6.3. Philadelphia Housing Data
+
+This is a very expansive data set - you can examine the metadata [at the City of Philadelphia's open data site](https://opendataphilly.org/datasets/philadelphia-properties-and-assessment-history/).
