@@ -23,19 +23,19 @@ This is a beginner's guide to predictive analytics. It introduces a few simple m
 
 Each section in this document details a different regression model we will use this semester in Land Use and Environmental Modeling (CPLN 6750 and the University of Pennsylvania Weitzman School of Design), and provides simple workflows in R using sample data sets.
 
-The learning objectives are as follows:
+**The learning objectives are as follows:**
 
 1. Understand what it means to "model" data using regression.
 
 2. Understand how regression models can be used to estimate outcomes, and learn how model selection is related to the outcome of interest.
 
-3. Learn about the training and testing workflow used to validate models in R.
+3. Observe and understand the training and testing workflow used to validate models in R.
 
-4. Learn basic regression terminology and statistics associated with OLS and binomial logit regression.
+4. Learn basic terminology and statistics associated with OLS and binomial logit regression.
 
-4. Understand the notion of model "accuracy" and "generalizability"
+5. Understand the notion of model "accuracy" and "generalizability"
 
-5. Learn how feature engineering can be used to improve model quality.
+6. Learn how feature engineering and spatial data can be used to improve model quality.
 
 ## 1.1. Explanation versus Prediction
 
@@ -47,9 +47,11 @@ The key to making above average predictive models is finding good independent va
 
 ## 1.2. Model Types
 
-We are going to demonstrate the use of two types of models, each is designed to suit a different type of outcome variable. First, we will use Ordinary Least Squares (OLS) regression to estimate normally distributed, continuous outcomes. Second we will use binary logistic regression to estimate 0/1 outcomes (e.g. estimating the probability of an outcome being a 1). Lastly we will use the Poisson regression model to estimate count data.
+**We are going to demonstrate the use of two types of models**, each is designed to suit a different type of outcome variable. First, we will use **Ordinary Least Squares (OLS) regression** to estimate normally distributed, continuous outcomes. Second we will use **binary logistic regression** to estimate 0/1 outcomes (e.g. estimating the probability of an outcome being a 1). Lastly, we will do some **feature engineering using spatial data for OLS**.
 
-Your choice of model depends on the use case.
+*Your choice of model depends on the use case - is the outcome you are interested in binomial or continuous?*
+
+There are other models for different outcome types not covered here, including Poisson regression for count data.
 
 ## 1.3. How Do Predictive Models "Work?"
 
@@ -81,9 +83,11 @@ ggplot(data, aes(x = x, y = y)) +
 
 Each of the models in this text apply a different fitted function to your data, but in the end, the predictive functionality is similar - they all output the "average" estimate given all the independent variables in the model.
 
-## 1.4 Validating Models
+## 1.4 How Do You Assess Model Performance?
 
-How do you know if your predictive model is doing a good job? We can split our data. We "train" our model using a portion of our data, and hold out a "test" set with all the same characteristics. When we "show" our model the independent variables from our test set, we can make predictions
+How do you know if your predictive model is doing a good job? We do this by "validating" the model. We hold out a sample of data where we know the actual outcome, and see if our model can accurately estimate the outcome.
+
+We can split our data. We "train" our model using a portion of our data, and hold out a "test" set with all the same characteristics. When we "show" our model the independent variables from our test set, we can make predictions
 
 We will have a few ways to judge that:
 
@@ -105,17 +109,51 @@ install.packages('tidyverse')
 
 If you have already installed a package on your computer, you can load it into your environment using the `library` command.
 
+`tidyverse` is the main family of data wrangling and visualization packages in R, including `ggplot2` and `dplyr`
+
+`sf` is the primary vector GIS package in the tidyverse, short for "Simple Features"
+
+`caret` is a package with tools for predictive modeling - training and testing models.
+
+`readr` is a package for reading in some data types, like Excel files.
+
+`plotROC` is a package used to create an ROC curve - a diagnostic test for logit models.
+
 ```{r load_pkg , message = FALSE, warning = FALSE}
 library(tidyverse)
 library(sf)
 library(caret)
 library(readr)
+library(plotROC)
 ```
 
 
 # 2. Ordinary Least Squares Linear Regression
 
 OLS regression, or multiple linear regression, is a simple model that can estimate the value of a continuous outcome - like prices or quantities. It's not good for count data, like numbers of incidents. It is simple, interpretable, and widespread.
+
+You've very likely seen "best fit" lines applied to an x-y scatterplot. The line is plotted to minimize the distance between the points and the line - that difference is the "error" associated with this estimate of the relationship. That's essentially what regression does, but fitting multiple lines for multi-dimensional data.
+
+```{r, message = FALSE}
+# Set seed for reproducibility
+set.seed(123)
+
+# Generate random x-y data
+data <- tibble(
+  x = rnorm(100, mean = 50, sd = 10),  # 100 random x values from normal distribution
+  y = 2 * x + rnorm(100, mean = 0, sd = 15)  # y follows a linear trend with some noise
+)
+
+# Plot the data with a best-fit line
+ggplot(data, aes(x = x, y = y)) +
+  geom_point(color = "blue", alpha = 0.6) +  # Scatter plot points
+  geom_smooth(method = "lm", color = "red", se = FALSE) +  # Best-fit line with confidence interval
+  theme_minimal() +
+  labs(title = "Randomly Generated X-Y Data with Best Fit Line",
+       x = "X Values",
+       y = "Y Values")
+
+```
 
 
 ## 2.1. Data set
@@ -124,19 +162,8 @@ We are going to use a [data set from the World Bank](https://www.kaggle.com/data
 
 Let's say we are interested in food system planning, and we want to be able to predict the yield (weight per hectre) for several crop types - maize, wheat, etc., under several scenarios for the coming year related to rainfall and temperature - a hot year, a rainy year, etc.,
 
-```{r load data}
-yield_df <- read_csv("~/GitHub/R_FAQ_For_Planners/modeling/data/yield_df.csv") %>%
-  rename(yield_hg_per_ha = `hg/ha_yield`) %>%
-  group_by(Area) %>% 
-  arrange(Item, Year) %>% 
-  group_by(Area, Item) %>% 
-  mutate(yield_last_year = lag(yield_hg_per_ha)) %>%
-  ungroup() %>%
-  filter(Year > 2010) %>%
-  group_by(Area, Item, Year) %>%
-  slice(1) %>%
-  ungroup() %>%
-  filter(is.na(yield_last_year) == FALSE)
+```{r load data, warning = FALSE, message = FALSE}
+yield_df <- read_csv("~/GitHub/R_FAQ_For_Planners/modeling/data/yield_df_clean.csv")
 ```
 
 ## 2.2. Exploratory Analysis
@@ -154,7 +181,7 @@ glimpse(yield_df)
 
 We can look at how our continuous variables are distributed. Some of them are similar - very right-tailed (including our dependent variable). Others are a bit all over the place.
 
-```{r}
+```{r, warning = FALSE, message = FALSE}
 
 yield_df %>%
   select(yield_hg_per_ha, average_rain_fall_mm_per_year, yield_last_year, pesticides_tonnes, avg_temp) %>%
@@ -183,11 +210,12 @@ yield_df %>%
   facet_wrap(~variable, scales = "free")+
   theme_minimal()
 ```
+
 ### 2.2.4. Correlations - Categorical variables
 
 Let's examine how our dependent variable might vary from category to category.
 
-This is a bit messy, but we can see that from country to country, and crop to crop, there is a lot of variation in yield. We would want to know what crop and country we are predicting for to generate an accurate estimate.
+This is a bit messy, but we can see that from country to country, and crop to crop, there is a lot of variation in yield. The fact that there are differences across categories means that this will probably be a good predictor in our model. If they were all the same, it wouldn't give us much predictive power.
 
 ```{r}
 yield_df %>%
@@ -202,43 +230,55 @@ yield_df %>%
 
 ## 2.3. A Simple Model
 
-Here's a simple example so we can take a look at our modeling outputs. Le's start by predicting yield using only rain fall, temperature and the amount of pesticides. This model is called `reg1`. We create the model using the `lm` function, which takes a data set, and an equation with a dependent variable (`yield_hg_per_ha`), then you put the independent variables on the other side of a `~` thingy.
+Here's a simple example so we can take a look at our modeling outputs. Le's start by predicting yield using only rain fall, temperature and the amount of pesticides. Look at the following code chunk to see how we do this with the `lm` function.
+
+The `lm` function takes a data set (`yield_df`), and an equation with a dependent variable (`yield_hg_per_ha`) followed by a `~` (called a "tilda").  You list the independent variables on the other side of the tilda.
+
+The lm function will output a model object, which we call `reg1`.
 
 ```{r}
 
-reg1 <- lm(data = yield_df, yield_hg_per_ha ~ average_rain_fall_mm_per_year + avg_temp + pesticides_tonnes)
+reg1 <- lm(data = yield_df, 
+           yield_hg_per_ha ~ 
+             average_rain_fall_mm_per_year + avg_temp + pesticides_tonnes)
 ```
 
 You can use the `summary` command to look at the model outputs.
 
 The model summary shows us a lot of information. Let's just focus on a three items of information - Beta Coefficients, p-values, and R-Squared.
 
-The beta coefficients aka `Estimate` - these show the strength (big or small) and the direction (positive or negative) of the relationship between an independent variable and our dependent variable (yield) given the other variables in the model. Here is an example of how they are interpreted using technical language. "On average, a one unit increase in `average_rain_fall_mm_per_year` is associated with a 5.335 unit increase in `yield_hg_per_ha`, all else equal."
+**The beta coefficients aka `Estimate`** - these show the strength (big or small) and the direction (positive or negative) of the relationship between an independent variable and our dependent variable (yield) given the other variables in the model. Here is an example of how they are interpreted using technical language. "On average, a one unit increase in `average_rain_fall_mm_per_year` is associated with a 5.335 unit increase in `yield_hg_per_ha`, all else equal."
 
-The p-value `Pr(>|t|)` represents the probability that this estimate is significantly different from zero (e.g. how much confidence do we have in the coefficient). A low p-value means a relatively high confidence in the estimate. Here it is `0.0773` - this is very low, but not low enough to show significance of the relationship in the eyes of, say, a medical journal reviewer. For our purposes though, a 7% chance the estimate is invalid, that's means there's a good chance this is a useful relationship for prediction.
+**The p-value `Pr(>|t|)`** represents the probability that this estimate is significantly different from zero (e.g. how much confidence do we have in the coefficient). A low p-value means a relatively high confidence in the estimate. Here it is `0.0773` - this is very low, but not low enough to show significance of the relationship in the eyes of, say, a medical journal reviewer. For our purposes though, a 7% chance the estimate is invalid, that's means there's a good chance this is a useful relationship for prediction.
 
-The R-Squared value tells us the amount of variance in the dependent variable that is explained by this combination of independent variables. This isn't the same as an "accurate" model, but higher values generally relate to more powerful predictive models. Here, the value is 0.02 - which is horrible.
+The **R-Squared** value tells us the amount of variance in the dependent variable that is explained by this combination of independent variables. This isn't the same as an "accurate" model, but higher values generally relate to more powerful predictive models. Here, the value is 0.02 (on a scale of 0-1) - which is horrible.
 
 ```{r}
 summary(reg1)
 
 ```
 
-Do we care about the beta coefficients, the p-values and the R-squared? Only a little bit - but nowhere close to as much as most people do when they use regression. We want to know whether these variables in this model predict yields well - we don't care about explaining why.  We can use these as diagnostics as we are building our model - adding features and engineering new ones. The real metrics we care about are discussed later.
+**Do we care about the beta coefficients, the p-values and the R-squared?** 
+
+Only a little bit - but nowhere close to as much as most people do when they use regression. We want to know whether these variables in this model predict yields well - we don't care about explaining their effects in isolation. We can use these as diagnostics as we are building our model - adding features and engineering new ones. The real metrics we care about are discussed later.
 
 ## 2.4. Fixed Effects
 
-Let's add some more variables - the type of crop, and the country where it was grown. It would stand to reason that the model "knowing" what country you're predicting yields for would help. Some countries are probably easier than other to grow crops. Our exploratory analysis told us that yields vary a lot across crop and country.
+It would stand to reason that the model "knowing" what country and crop type you're predicting yields for would help. Some countries are probably easier than other to grow crops. Our exploratory analysis told us that yields vary a lot across crop and country.
+
+Let's add these "categorical" variables to our model.
 
 When you add a categorical variable, like country (the variable `Area`), it's known as a "fixed effect" or a "dummy variable" - where each category is given it's own line item in the regression summary, complete with an estimate. One level of the fixed effect is not represented in the summary - so there's one country you don't see here. Each estimate and p-value relates to that "base case" hold out.
 
-For example, in this regression - each coefficient represents the unit change in crop yield associated with being in Algeria relative to being in Albania (the hold out country), or the yield associated with Maize relative to Cassava.
+Let's create a new regression, called `reg2`. In this regression - each coefficient represents the unit change in crop yield associated with being in Algeria relative to being in Albania (the hold out country), or the yield associated with Maize relative to Cassava.
 
 Adding these fixed effects made our R-Squared go wayyyy up - if we know the rainfall, country, crop and pesticide application, we can explain almost 80% of the variance in crop yields. Pretty good - but not quite a prediction.
 
 ```{r}
 
-reg2 <- lm(data = yield_df, yield_hg_per_ha ~ average_rain_fall_mm_per_year + avg_temp + pesticides_tonnes + Item + Area)
+reg2 <- lm(data = yield_df, 
+           yield_hg_per_ha ~ 
+             average_rain_fall_mm_per_year + avg_temp + pesticides_tonnes + Item + Area)
 
 summary(reg2)
 
@@ -246,7 +286,7 @@ summary(reg2)
 
 Let's try a different approach - we saw there is a very strong relationship between yield and `yield_last_year` - what if we took the country out of the model, and put this in.... wow. That's a very strong predictor and a very high R-squared.
 
-You can see that it basically knocks rainfall, temperature and pesticides out of the model in terms of significance (p-values). This is because these things are "multi-colinear" - a sign that the estimates are not very reliable when these variables are in the model together. This is a major way that prediction and explanation are very different when you use OLS models - we are violating some important stats assumtions.
+You can see that it basically knocks rainfall, temperature and pesticides out of the model in terms of significance (p-values). This is because these things are "multi-colinear" - a sign that the coefficient values are not very reliable when these variables are in the model together. This is a major way that prediction and explanation are very different when you use OLS models - we are violating some important stats assumtions.
 
 ```{r}
 
@@ -292,9 +332,11 @@ reg.training_1 <-
 
 ```
 
-### 2.5.3. Predicting for our Test Set
+### 2.5.3. Predicting for our Test Set and Assessing Error
 
 We can now use the `predict` function to "show" our test set `yield_test` to the model `reg.training_1`, and make a prediction for each row.
+
+Our model only knows how to make predictions for a data frame that contains the exact same information it has "seen" when we trained it with`yield_training` - so your test set has to have exactly the same columns - same names, same data types - for this to work.
 
 We want to know how much our predictions missed the mark - in absolute and percentage terms.
 
@@ -309,13 +351,12 @@ yield_test_with_results <-
          Abs_Pct_Error = (abs(Prediction - yield_hg_per_ha)) / yield_hg_per_ha)
 ```
 
-Last step, we can summarize our errors - what is our Mean Absolute Percentage Error (MAPE)?
 
-What is our Mean Absolute Error (MAE)?
+## 2.5.4. Accuracy and Generalizeability
 
-Not bad!
+To assess accuracy, we can summarize our errors - what is our Mean Absolute Percentage Error (MAPE)? What is our Mean Absolute Error (MAE)? This is very useful because it puts our errors into understandable terms - how much did we miss by? Easier to explain than R-squared!
 
-On average, we can predict yearly crop yields within 13%.
+Not bad! On average, we can predict yearly crop yields within 13%.
 
 
 ```{r}
@@ -324,6 +365,7 @@ yield_test_with_results %>%
          MAE = mean(AbsError))
 
 ```
+
 The last thing we want to do is see if our model is performing better or worse depending on the context. It would be good to know if we are making accurate predictions about, say, soybeans, but missing badly on maize.
 
 We can group our results by `Item` and summarize our errors by crop type. As you can see, there is some variability,.
@@ -345,7 +387,7 @@ It does this by fitting an s-shaped function to 0/1 data, unlike OLS, which fits
 The tricky part is that you end up with predictions that range from 0-1, and you need to figure out what threshold to use to classify your predictions, which may be values like 0.7 or 0.35, as "1" or "0".
 
 
-```{r}
+```{r, message = FALSE}
 
 
 # Generate predictor variable (x)
@@ -368,7 +410,7 @@ logit_model <- glm(y ~ x, data = ex_data, family = binomial)
 # Plot data with logistic regression fit
 ggplot(ex_data, aes(x = x, y = y)) +
   geom_jitter(width = 0.1, height = 0.05, alpha = 0.5, color = "blue") +  # Jitter to avoid overplotting
-  geom_smooth(method = "glm", method.args = list(family = binomial), color = "red") +  # Logistic fit
+  geom_smooth(method = "glm", method.args = list(family = binomial), color = "red", se = FALSE) +  # Logistic fit
   theme_minimal() +
   labs(title = "Simulated Logit Function with Logistic Regression Fit",
        x = "X values",
@@ -409,7 +451,7 @@ We can use some simple `dplyr` logic to look at whether the mean values of our c
 
 At first glance, it looks like lower concentration of lignin and phenolics in the organism is associated with death, as is time (which is time from planting to harvesting).
 
-```{r}
+```{r, warning = FALSE, message = FALSE}
 trees %>%
   select(Event, Time, NSC, Lignin, Phenolics, EMF, AMF) %>%
   gather(-Event, key = "variable", value = "value") %>%
@@ -426,7 +468,7 @@ Another approach worth trying is looking at the distributions of the different v
 
 Using this approach I can see that amongst trees that die, lignin and phenolics and NSC seem to have right tailed distributions, and there's a discrete split at a certain value. We can also see that something seems kind of weird with the "Time" variable - maybe it represents two harvest periods.
 
-```{r}
+```{r, warning = FALSE, message = FALSE}
 trees %>% 
     select(Event, Time, NSC, Lignin, Phenolics, EMF, AMF) %>%
     gather(-Event, key = "variable", value = "value") %>%
@@ -445,7 +487,7 @@ We can use some simple `dplyr` logic to look at whether our categorical variable
 It seems like species has a big effect - huge differences between the species in the frequency of 0's and 1's.
 
 
-```{r}
+```{r, message = FALSE, warning = FALSE}
 trees %>%
   select(Event, Soil, Sterile, Conspecific, Myco, SoilMyco, Species) %>%
   gather(-Event, key = "variable", value = "value") %>%
@@ -461,16 +503,10 @@ trees %>%
 
 ## 3.3. A Simple Model
 
-You can play around with lots of different combinations in the model
+Let's make a simple model using the `glm` function, and setting the model `family = "binomial"` to specify a logit model. The form of the model code is otherwise the same as with `lm`.
 
-Soil types and Mycorrhizal types seem to be very collinear, so I've left them out of the model...
+Our model is a mix of fixed effects and continuous variables. We saw before that soil types (`Soil`) and mycorrhizal types (`Myco`) tend to be more or less redundant, so I've left one of those out of the model, figuring they "explain" the same information. 
 
-Feature engineering thing - based on exploratory analysis, cut lignin etc. up a categorical variables.
-
-mutate(Lignin = ifelse(Lignin > 15, "High", "Low"))
-
-Logit function
-Coefficients
 McFadden
 p-values
 
@@ -479,16 +515,18 @@ p-values
 reg_logit <- glm(data = trees , 
                  Event ~ Light_ISF + NSC + Lignin + Phenolics + Species + Soil,
                  family="binomial")
+```
 
+Let's examine a model summary and quickly go over some of the statistics and outputs you see there.
+
+```{r}
 summary(reg_logit)
 
 ```
 
-Interpret the coefficients
+The coefficients show the strength and direction of the relationship. They are interpretable in terms of the "log odds" of the dependent variable being a "1". This is not very useful when you are trying to understand relationships, so you can exponentiate the coeffecients to "un-log" them and just get plain "odds".
 
-The odds of a _____ dying are X times that of a _______
-
-All else equal, the odds of a tree dying increase by x% (e.g. 1.14 is 14%) with a unit change in the independent variable.
+You can try that here:
 
 ```{r}
 exp_coef <- reg_logit$coefficients %>%
@@ -498,8 +536,27 @@ exp_coef <- reg_logit$coefficients %>%
 
 ```
 
+```{r}
+exp_coef
+
+```
+
+So for example, you'd say "All else equal, on average, the odds of a tree dying increase by x% (e.g. 1.14 is 14%) with a unit change in the independent variable."  If you have a fixed effect, you are comparing the odds between the levels of that fixed effect, "All else equal, on average, the odds of a tree of species A_____ dying are X times that of tree of species B"
+
+
+The p-values are similar to those from OLS - they represent the probability that the coefficient's value is significantly different from zero - basically, our confidence the in the coefficient estimate.
+
+The McFadden R-Squared is a "pseudo R Squared" in that it doesn't tell us the same thing as R-squared from OLS (the amount of variance in the DV that's explained by the model) but it's a useful diagnostic of model quality. Closer to 1 is stronger. That said, we are interested in predictive accuracy and generalizability, not so much in R-squared.
 
 ## 3.4. Training and Testing
+
+## 3.4.1. Splitting our Data
+
+This process is identical to what we did in training an OLS model.
+
+We use the `set.seed` command to generate a random number sequence. We then use the `createDataPartition` command from the `caret` package to split our data. The p argument takes a number - here we say .70 to indicate that we want 70% of our data in the training set. There’s no set rule for the split size. The `paste` command is where we specify categorical variables - we want to make sure that single observations of categories end up in our test set.
+
+We create two data frames - `treeTrain` and `treeTest`.
 
 ```{r}
 set.seed(1234)
@@ -514,23 +571,52 @@ treeTest  <- trees[-treetrainIndex,]
 
 ```
 
+## 3.4.2. Creating a Regression
+
+Let's put our independent variables from `reg_logit` into a `glm` logit model we trained on our training set, `treeTrain`. We will call this model `logit_train`
+
 ```{r}
 logit_train <- glm(data = treeTrain, Event ~ Light_ISF + NSC + Lignin + Phenolics +  
                                        Species + Soil,
                  family="binomial"(link="logit"))
 ```
 
+## 3.4.3. Predicting for our Test Set
+
+We `mutate` a new column in our `treeTest` test set that contains our estimates. We use the `predict` function to do this.
+
+`predict` takes a few arguments - our model `logit_train`, and a data set, `treeTest`.
+
+Our model only knows how to make predictions for a data frame that contains the exact same information it has "seen" when we trained it with`treeTrain` - so your test set has to have exactly the same columns - same names, same data types - for this to work.
+
 ```{r}
 
 treeTest_with_results <-
   treeTest %>%
-  mutate(estimate = predict(logit_train, .,  type="response"))
+  mutate(estimate = predict(logit_train, treeTest,  type="response"))
 
 ```
 
-Let's talk about how to interpret this and what the threshold should be.
+The predictions are not 1's and 0's, they fall in the range 0-1 - they are probabilities of the outcome being 0 or 1.
 
-```{r}
+We need to classify them according to some threshold - above that threshold, we will classify it a 1, below we will classify it a 0.
+
+Let's examine a histogram of our estimates to see what our range of values is. We can see it's pretty bi-modal.
+
+```{r, warning = FALSE, message = FALSE}
+ggplot()+
+  geom_histogram(data = treeTest_with_results, aes(estimate))+
+  theme_bw()
+
+```
+
+## 3.4.4. Understanding Accuracy - Setting a Threshold for Classification
+
+Remember, in our test data, we know the *actual* outcomes for each observation (`Event`). If we split our estimates along those lines, we can see that we have some high and low probabilities in both categories, but on average we seem to be getting mostly high probabilities for our 1's and low probabilities for our 0's. That's good!
+
+In our next step, we will move forward with a threshold of 0.4 - if our estimate is above that, we will say we are classifying this an estimated `1`, otherwise, a `0`. This means we will have a lot of accurate classifications, but also some errors.
+
+```{r, warning = FALSE, message = FALSE}
 treeTest_with_results %>%
   ggplot()+
   geom_histogram(aes(estimate))+
@@ -538,9 +624,10 @@ treeTest_with_results %>%
   theme_bw()
 
 ```
-### 3.4.2. Confusion Metrics
 
-Let's create the results again but let's add the threshold to classify 1/0
+### 3.4.5. Confusion Metrics - Understanding Our 4 Outcomes
+
+Let's create the `treeTest_with_results` dataframe again using the `predict` function, but let's add a new column called `prediction` that says "if the prediction is greater or equal to 0.4, prediction = 1, otherwise, it's a 0."
 
 ```{r}
 
@@ -552,15 +639,25 @@ treeTest_with_results <-
 
 ```
 
-True Positive
-True Negative
-False Positive
-False Negative
+We are going to have four outcomes to our model, and it's important to be able to understand these by explaining them in plain English.
 
-Accuracy
+**True Positive** - We predicted the tree would die, and it did die.
 
-Sensitivity
-Specificity
+**True Negative** - We predicted the tree would not die, and it did not die.
+
+**False Positive** - We predicted the tree would die, and it did not. (An error!)
+
+**False Negative** - We predicted the tree would not die, and it did. (Also an error!)
+
+Our overall accuracy is the amount of True Positives and True Negatives as a percentage of total observations.
+
+Logistic regression has a ton of (confusing) terms, among those are "sensitivity" and "specificity"
+
+**Sensitivity** - True Positive Rate - the percentage of positives we classify correctly
+
+**Specificity** - True Negative Rate - the percentage of negatives we classify correctly
+
+Fittingly, there is a thing called a "Confusion Matrix" which shows us a range of statistics associated with our classification model:
 
 ```{r}
 caret::confusionMatrix(treeTest_with_results$prediction, as.factor(treeTest_with_results$Event), positive = "1")
@@ -594,22 +691,185 @@ treeTest_with_results %>%
 
 ```
 
-ROC & AUC
+### 3.4.6. ROC Curves
+
+The ROC curve (or "receiver operating characteristic" curve) is a diagnostic to see how well our model is performing.
+
+In the plot below - the y=x line represents a model that's a "coin flip" - by just guessing 1's and 0's you could make a model like this. If our ROC curve is convex and north of the line (like the one you see below) - it means that we have a fairly good model - we are doing better than a coin flip. If our model were a hard right angle shape - it would mean our model is "overfit" - it's predicting with extremely high accuracy, and probably is inflexible to new information.
+
+```{r, warning = FALSE}
+ggplot(treeTest_with_results, aes(d = as.numeric(Event), m = as.numeric(estimate))) + 
+  geom_roc(n.cuts = 50, labels = FALSE) + 
+  style_roc(theme = theme_grey) +
+  geom_abline(slope = 1, intercept = 0, size = 1.5, color = 'grey')+
+  theme_bw()
+
+```
 
 # 4. Feature engineering methods
 
-The key to making a really good model is engineering independent variables that are stronly predictive of the dependent variable. This might mean joining your data to a new data set, recategorizing variables you already have in your set, or transforming them to get more predictive power.
+The key to making a really good model is engineering independent variables that are strongly predictive of the dependent variable. In the examples above, the data sets we used were very clean, and had good predictive accuracy as-is. In real life, that's not usually the case. To make a good model, you need to use your intuition about the phenomenon you are modeling to form a hypothesis about what kind of information might be predictive of your outcome.
 
-Maybe do this with some housing data - spatial fixed effects, st_distance, reclassification, log transformation
+This might mean joining your data to a new data set (using a tabular or spatial join), recategorizing variables you already have in your set, or transforming them to conform to the assumptions of the model type in order get more predictive power.
+
+## 4.1. Data
+
+Let's use some data on 2023 Philadelphia home sales from the City of Philadelphia Office of Property Assessment to attempt to predict sales prices for single family homes. Our dependent variable will be `sale_price`, a continuous outcome.
+
+The general model approach will be the "hedonic" model, where the price of a good is decomposed into it's constituent parts.
+
+For homes, this means the price is a function of the internal characteristics (number of bedrooms, bathrooms, AC, garage, fixtures) the location (and the local amenities like schools), the condition, lot size, and comparable sales (nearby prices).
+
+Let's load in some data - these are spatial data (geojson), which we can read using `st_read` from the `sf` package. Each house has a point geometry associated with it.
+
+```{r, message=FALSE, warning = FALSE, echo = FALSE, results = 'hide'}
+
+homes <- st_read("~/GitHub/R_FAQ_For_Planners/modeling/data/homes.geojson") %>%
+  st_as_sf() %>%
+  st_transform(4326)
+
+```
+We can make a very basic hedonic model using bedrooms, bathrooms, year built, and total livable area to see how much variance our basic predictors explain in the dependent variable `sale_price`.
+
+The R-Squared is about .51.
+
+```{r}
+
+summary(lm(data = homes, sale_price ~ year_built + number_of_bedrooms + number_of_bathrooms + total_livable_area))
+
+```
 
 
-Reclassification
-Normalization
-Transformation
-knn
-spatial join
+## 4.2. Reclassification
+
+I have a hypothesis that the relationship between a house's age and it's sale price is not continuous. A new house might be very desirable, a post-war house might be in need of major renovations, and a house built in the 1700s or 1800s might have historic appeal. Take a look at the scatterplot below:
+
+```{r}
+ggplot(homes)+
+  geom_point(aes(x = year_built, y = sale_price))+
+  theme_bw()
+
+```
+
+Let's reclassify homes into a few different categories - `new`, `victorian`, `mid-century`, `modern`, and `historic`.
+
+```{r}
+
+homes <- homes %>%
+  mutate(age_categorical = case_when(year_built <= 1880 ~ "historic",
+                                     year_built > 1880 & year_built <= 1920 ~ "victorian",
+                                     year_built > 1920 & year_built <= 1980 ~ "mid-century",
+                                     year_built < 1980 & year_built <= 2000 ~ "modern",
+                                     year_built > 2000 ~ "modern"))
+
+```
+
+Let's also specify that number of bedrooms are different categories - not numerical variables. A 6 bedroom house isn't inherently 3x more valuable than a 2 bedroom house - they are totally different types of homes!
+
+```{r}
+homes <- homes %>%
+  mutate(bedrooms_categorical = as.factor(number_of_bedrooms))
+
+```
+
+How does this affect our model? It improves it a little bit!
+
+```{r}
+summary(lm(data = homes, sale_price ~ bedrooms_categorical + number_of_bathrooms + total_livable_area + age_categorical))
+
+```
+
+## 4.3. Spatial Variables
+
+What's the most important thing about a house? Location, Location, Location - that's what they always say!
+
+Let's create variables that account for some things about a house's location.
+
+### 4.3.1. Spatial Fixed Effects
+
+We can join our homes to the zip codes to which they belong. This creates a proxy variable for "neighborhood" that you can use as a fixed effect in a model.
+
+Let's load a shape of Philadelphia zip codes and make sure it's projected in crs = 4326 (same as our homes) by using `st_transform`.
+
+```{r, message = FALSE, warning = FALSE, echo = FALSE, results = 'hide'}
+
+zips <- st_read("~/GitHub/R_FAQ_For_Planners/modeling/data/zctas_philly.geojson") %>%
+  st_as_sf() %>%
+  st_transform(4326)
+
+```
+Now we can do a point-in-polygon join, adding our zip code information to our homes.
+
+```{r}
+homes <- st_join(homes, zips)
+```
+
+We can code zip code as a categorical variable - each "neighborhood" represents a different category of location.
+
+```{r}
+
+homes <- homes %>%
+  mutate(zip_code = as.factor(zip_code))
+
+```
+
+
+If we run another model that includes the `zip_code` fixed effect, we can see that there is an enormous boost in the R-squared value.
+
+
+```{r}
+summary(lm(data = homes, sale_price ~ bedrooms_categorical + number_of_bathrooms + total_livable_area + age_categorical + zip_code))
+
+```
+
+### 4.3.2. K-Nearest-Neighbor Distance and Value
+
+You might want engineer variables that account for the distance of a house from the nearest commercial corridor, or the average price per square foot of the 3 nearest sales. Using the sf package, this is all possible.
+
+Using the `FNN` package, you could calculate the nearest neighbor distance from each home to the nearest 3 restaurants or parks.
+
+Using the `spdep` package, you could calculate the average square footage price of the 3 nearest sales - a good parameter to represent "comps" - nearby sales (demonstrated below).
+
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
+library(spdep)
+
+
+neighborList <- knn2nb(knearneigh(st_coordinates(homes), 5))
+
+spatialWeights <- nb2listw(neighborList, style="W")
+
+homes$lagPriceSqFt <- lag.listw(spatialWeights, homes$sale_price/homes$total_livable_area)
+
+```
+
+
+```{r}
+summary(lm(data = homes, sale_price ~ bedrooms_categorical + number_of_bathrooms + total_livable_area + age_categorical + zip_code + lagPriceSqFt))
+
+```
+## 4.4 Variable Transformations and Interactions
+
+One of the core assumptions of regression modeling is that variables be normally distributed. With predictive modeling, we sometimes play fast and loose with assumptions, but the models do perform better when this is the case.
+
+Here are a few ways you can transform your variables.
+
+**Normalization** - you can use rate statistics or ratios as your modeling yardsticks. Perhaps it's more accurate to estimate price-per-square-foot than raw price.
+
+**Standardization** - you can recenter your variables in a normal distribution centered on zero. Linear regression functions better with normally distributed variables.
+
+**Transformation** - You can take variables that aren't normally distributed and transform them using log transformation. This is done very often with pricing models, where home prices are logged before modeling.
+
+A last engineering technique is to "interact" variables.
+
+**Interactions** - When the relationship between an independent predictor and the dependent variable depend on another predictor variable, you can *interact* the two variables in the model using the `*` multiply sign.
+
 
 # 5. Data Dictionaries
+
+## 5.1. Crop Yield Dataset
+
+    - 
+
 
 ## 5.2. Wood Et Al
 
